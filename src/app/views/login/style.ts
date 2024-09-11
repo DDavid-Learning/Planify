@@ -1,7 +1,7 @@
 import { Container, Box } from "@mui/material";
 import styled from "styled-components";
 
-export const LoginContainer = styled(Container)<{ $small?: boolean }>`
+export const LoginContainer = styled(Container) <{ $small?: boolean }>`
   height: ${(props) => (props.$small ? "100vh" : "70%")};
   background: #fff;
   border-radius: 10px;
@@ -12,11 +12,13 @@ export const LoginContainer = styled(Container)<{ $small?: boolean }>`
   border: 2px solid ${({ theme }) => theme.COLORS.GRAY5};
 `;
 
-export const LoginLogo = styled(Box)<{ $small?: boolean }>`
+export const LoginLogo = styled(Box) <{ $small?: boolean }>`
   position: relative;
   background-size: 60%;
+background-image: url("https://i.imgur.com/d4JC24X.png");
   background-position: center;
   background-repeat: no-repeat;
+    background-size: ${(props) => (props.$small ? "100%" : "90%")};
   border-radius: ${(props) => (props.$small ? "10px" : "10px 0px 0 10px")};
   width: ${(props) => (props.$small ? "80px" : "45%")};
   height: ${(props) => (props.$small ? "80px" : "100%")};
@@ -37,8 +39,8 @@ export const LoginLogo = styled(Box)<{ $small?: boolean }>`
   }
 
   @media (max-width: 768px) {
-    width: 120px;
-    height: 120px;
+    width: 220px;
+    height: 220px;
     background-size: contain;
     top: 10px;
     &::before {

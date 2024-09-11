@@ -44,7 +44,7 @@ const Login = () => {
             marginRight: -20,
             marginTop: -3,
             textDecoration: "underline",
-            color: theme.COLORS.YELLOW2
+            color: theme.COLORS.PURPLE3
           }}
         >
          Registrar-se
@@ -56,6 +56,7 @@ const Login = () => {
               borderRadius: 1,
               position: "relative",
               height: "45px",
+              backgroundColor: theme.COLORS.PURPLE1,
             }}
             fullWidth
             variant="contained"

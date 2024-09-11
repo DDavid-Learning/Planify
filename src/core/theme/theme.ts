@@ -14,7 +14,11 @@ export default {
       GRAYHARD: "#666360",
       TEXTDARK: "#000000",
       WHITE_100: "#FFFFFF",
-  
+      PURPLE: "#DDA0DD",
+      PURPLE1: "#9966CC",
+      PURPLE2: "#E6E6FA",
+      PURPLE3: "#800080",
+      PURPLE4: "#4B0082",
       RED: "#EB5757",
       ORANGE_300: "#fbb605",
       ORANGE: "#F2994A",
@@ -37,9 +41,6 @@ export default {
       GRAY1: "#333333",
   
       PINK: "#D71CDB",
-      PURPLE2: "#BB6BD9",
-      PURPLE1: "#9B51E0",
-      PURPLE: "#9038FF",
       PURPLEDARK1: "#6E34B8",
       PURPLEDARK2: "#5B259F",
       PURPLEDARK3: "#2F1155",
