@@ -11,7 +11,7 @@ interface Props {
 
 const FullScreenContainer = ({ children }: Props) => {
   const location = useLocation();
-  const isLoginPage = location.pathname === "/login";
+  const isLoginPage = location.pathname === "/login" || location.pathname === "/registro";
   return (
     <ThemeProvider theme={theme}>
       <LayoutContainer $isLoginPage={isLoginPage}>
