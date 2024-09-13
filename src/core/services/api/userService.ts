@@ -1,5 +1,27 @@
-import { DETAILS_USER, REGISTER_USER } from "../../constants/constants";
+import { DETAILS_USER, EDIT_USER, REGISTER_USER } from "../../constants/constants";
 import { Api } from "./api";
+
+const rmvUser = async (token: string, userId?: string) => {
+    try {
+        const response = await Api.delete(EDIT_USER + userId);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+const editUser = async (userId: string, token: string,  username?: string, email?: string, password?: string) => {
+    console.log(`Req: ${EDIT_USER + userId}`)
+    try {
+        const response = await Api.put(EDIT_USER + userId, { username: username, email: email, password: password }, 
+            {headers: {Authorization: `Bearer ${token}`}}
+        );
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 
 const registerUser = async (username: string, email: string, password: string) => {
     try {
@@ -21,5 +43,7 @@ const detailsUser = async (userId: string) => {
 
 export const userService = {
     registerUser,
-    detailsUser
+    detailsUser,
+    editUser,
+    rmvUser
 }

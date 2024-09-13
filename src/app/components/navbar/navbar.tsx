@@ -13,7 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 import PersonIcon from '@mui/icons-material/Person';
 import theme from '../../../core/theme/theme';
 import { LoginLogo } from './style';
-import { CircularProgress, InputAdornment, TextField } from '@mui/material';
+import { CircularProgress, InputAdornment } from '@mui/material';
 import DefaultModal from '../defaultModal/defaultModal';
 import GenericTextField from '../genericTextField/genericTextField';
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
@@ -23,21 +23,23 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useAuth } from '../../../core/context/auth/useAuth';
 import { useEffect, useState } from 'react';
 import { userService } from '../../../core/services/api/userService';
-import { getUserLocalStorage } from '../../../core/utils/localStorage';
 import { useFormik } from 'formik';
 import * as Yup from "yup";
+import DefaultDialog from '../defaultDialog/defaultDialog';
 
 const pages = ['Dashboard', 'Histórico', 'Metas', 'Categorias'];
 const settings = ['Perfil', 'Sair'];
 
 function Navbar() {
-  const { logout, userId } = useAuth();
+  const { logout, userId, token} = useAuth();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [openProfileModal, setOpenProfileModal] = React.useState(false); // Estado para abrir/fechar modal
   const [user, setUser] = useState<any>();
   const [showPassword, setShowPassword] = useState(false);
+  const [confirmation, setConfirmation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
   function togglePassword() {
     setShowPassword(!showPassword);
   }
@@ -76,6 +78,19 @@ function Navbar() {
     fetchUserDetails();
   }, [openProfileModal, userId]);
 
+  const handleRmvUser = React.useCallback(async () => {
+    console.log(`Deletando esse usuário: ${userId}, com esse token: ${token}`);
+    await userService.rmvUser(token!, userId);
+    console.log('deletado');
+    logout();
+  }, [userId]);
+
+  const handleEditProfile = React.useCallback(async (user: any) => {
+    console.log(`Editando esse usuário: ${userId}, com esse token: ${token}`);
+    await userService.editUser(userId!, token!, user?.username, user?.email);
+    console.log('editado');
+  }, [userId]);
+
   const formik = useFormik({
     initialValues: {
       username: user?.username ? user.username : "",
@@ -84,13 +99,12 @@ function Navbar() {
       confirmPassword: "",
     },
     validationSchema,
-    validateOnChange: false, // Validação será feita apenas no submit
+    validateOnChange: false,
     onSubmit: (values) => {
-      console.log(values)
+      console.log(values);
+      handleEditProfile(values);
     },
   });
-
-
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -209,6 +223,15 @@ function Navbar() {
         </Container>
       </AppBar>
 
+                <DefaultDialog
+                  isOpen={confirmation}
+                  title="Deletar Conta"
+                  onCloseAction={() => setConfirmation(false)}
+                  confirmAction={() => handleRmvUser()}
+                  confirmText="Deletar"
+                  body={<Typography sx={{ fontSize: "0.8pc" }}>Tem certeza que deseja deletar sua conta?</Typography>}
+                />
+
       {/* Modal do Perfil */}
       <DefaultModal
         title="Perfil"
@@ -321,8 +344,11 @@ function Navbar() {
                 <Button variant='contained' sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE, width: "100px" }} onClick={() => setOpenProfileModal(false)}>
                   CANCELAR
                 </Button>
-                <Button variant='contained' sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE, width: "100px" }}>
+                <Button type='submit' onClick={() => formik.handleSubmit()} variant='contained' sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE, width: "100px" }}>
                   Salvar
+                </Button>
+                <Button onClick={() => setConfirmation(true)} variant='contained' sx={{ backgroundColor: theme.COLORS.RED, color: theme.COLORS.WHITE }}>
+                  Deletar Conta
                 </Button>
               </Box>
             </>
