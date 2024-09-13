@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { IAuthProvider, IContext, IUser } from "../../models/authContext";
 import { getUserLocalStorage, setUserLocalStorage } from "../../utils/localStorage";
 import { LoginRequest } from "../../services/user/userAuth";
-
+import { jwtDecode } from "jwt-decode";
 interface IDialogContext {
     isLogoutDialogOpen: boolean;
     openLogoutDialog: () => void;
@@ -14,6 +14,11 @@ const defaultDialogContext: IDialogContext = {
     openLogoutDialog: () => { },
     closeLogoutDialog: () => { }
 };
+
+interface DecodedToken {
+    userId: string;
+    sub: string;
+}
 
 export const AuthContext = createContext<IContext & IDialogContext>({
     ...defaultDialogContext,
@@ -35,15 +40,25 @@ export const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
     async function authenticate(email: string, senha: string) {
         try {
             const resp = await LoginRequest(email, senha);
-            const payload = { token: resp.token, email };
+            
+            // Decodificar o token para obter as informações do usuário
+            const decodedToken = jwtDecode<DecodedToken>(resp);
+            
+            // Preparar o payload com as informações decodificadas
+            const payload = {
+                token: resp,
+                userId: decodedToken.userId,
+                email: decodedToken.sub,
+            };
+            
             setUser(payload);
             setUserLocalStorage(payload);
+            
             return resp;
         } catch (error) {
             throw error;
         }
     }
-
     function logout() {
         setUser(null);
         setUserLocalStorage(null);

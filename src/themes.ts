@@ -4,13 +4,13 @@ import theme from "./core/theme/theme";
 const Theme = createTheme({
     palette: {
         primary: {
-            main: theme.COLORS.YELLOW2,
-            dark: "#858796",
+            main: theme.COLORS.PURPLE3,
+            dark: theme.COLORS.PURPLE3,
         },
         secondary: {
-            main: theme.COLORS.YELLOW2,
-            light: theme.COLORS.YELLOW,
-            dark: "#eaeaea",
+            main: theme.COLORS.PURPLE3,
+            light: theme.COLORS.PURPLE3,
+            dark: theme.COLORS.PURPLE3,
         },
     },
     typography: {
@@ -58,16 +58,16 @@ const Theme = createTheme({
                 {
                     props: { variant: "outlined" },
                     style: () => ({
-                        color: theme.COLORS.YELLOW2,
+                        color: theme.COLORS.PURPLE3,
                         fontSize: "0.8pc",
                         border: "1px solid",
-                        borderColor: theme.COLORS.YELLOW2,
+                        borderColor: theme.COLORS.PURPLE3,
                         fontWeight: "bold",
                         boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.2)",
                         letterSpacing: "0.1em",
                         padding: "10px 20px 10px 20px",
                         "&:hover": {
-                            backgroundColor: theme.COLORS.YELLOW2,
+                            backgroundColor: theme.COLORS.PURPLE3,
                             color: theme.COLORS.WHITE,
                         },
                     }),

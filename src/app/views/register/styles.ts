@@ -50,7 +50,7 @@ background-image: url("https://i.imgur.com/d4JC24X.png");
 `;
 
 export const LoginContentBox = styled.form<{ $small?: boolean }>`
-  width: ${(props) => (props.$small ? "100%" : "50%")};
+  width: ${(props) => (props.$small ? "100%" : "53%")};
   height: 100%;
   display: flex;
   flex-direction: column;
