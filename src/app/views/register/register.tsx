@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useCallback, useState } from "react";
 import { userService } from "../../../core/services/api/userService";
+import { Notification } from "../../components/toastNotification/toastNotification";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ const Register = () => {
       await userService.registerUser(values.username, values.email, values.password)
         .then(() => {
           setIsLoading(false);
+          Notification("Usuário registrado com sucesso", "success");
           navigate("/login");
         })
         .catch(() => setIsLoading(false));

@@ -23,8 +23,7 @@ export const ProtectedRoutes = () => {
     return (
         <Box sx={{ display: "flex", flex: 1, overflowX: "hidden", flexDirection: "column" }}>
             <Navbar />
-
-            <Box sx={{ display: "flex", flex: 1 }}>
+            <Box sx={{ display: "flex", flex: 1}}>
                 <Outlet />
             </Box>
         </Box>

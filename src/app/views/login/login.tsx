@@ -13,6 +13,7 @@ import { useFormik } from "formik";
 import { useCallback, useState } from "react";
 import { useAuth } from "../../../core/context/auth/useAuth";
 import { AxiosError } from "axios";
+import { Notification } from "../../components/toastNotification/toastNotification";
 
 
 const Login = () => {
@@ -37,10 +38,12 @@ const Login = () => {
     try {
       const resp = await auth.authenticate(values.email, values.password);
       setIsLoading(false);
+      Notification("Login efetuado com sucesso", "success");
       navigate("/home");
     } catch (error) {
       if (error instanceof AxiosError) {
         console.log(error.response?.data.message);
+        Notification("Credenciais inválidas", "error");
         setIsLoading(false);
       } else {
         console.error("Ocorreu um erro inesperado");

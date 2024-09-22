@@ -26,12 +26,15 @@ import { userService } from '../../../core/services/api/userService';
 import { useFormik } from 'formik';
 import * as Yup from "yup";
 import DefaultDialog from '../defaultDialog/defaultDialog';
+import { Notification } from '../toastNotification/toastNotification';
+import { useNavigate } from 'react-router-dom';
 
-const pages = ['Dashboard', 'Histórico', 'Metas', 'Categorias'];
+const pages = ['Dashboard', 'Transações', 'Metas', 'Categorias'];
 const settings = ['Perfil', 'Sair'];
 
 function Navbar() {
   const { logout, userId, token} = useAuth();
+  const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [openProfileModal, setOpenProfileModal] = React.useState(false); // Estado para abrir/fechar modal
@@ -42,6 +45,25 @@ function Navbar() {
   
   function togglePassword() {
     setShowPassword(!showPassword);
+  }
+
+  const handleClickPages = (page: string) => {
+    switch (page) {
+      case "Dashboard":
+        navigate("/home");
+        break;
+      case "Transações":
+        navigate("/transacoes");
+        break;
+      case "Metas":
+        navigate("/home");
+        break;
+      case "Categorias":
+        navigate("/categorias");
+        break;
+      default:
+        break;
+    }
   }
 
   const validationSchema = Yup.object().shape({
@@ -81,14 +103,15 @@ function Navbar() {
   const handleRmvUser = React.useCallback(async () => {
     console.log(`Deletando esse usuário: ${userId}, com esse token: ${token}`);
     await userService.rmvUser(token!, userId);
-    console.log('deletado');
+    Notification("Conta deletada com sucesso", "success");
     logout();
   }, [userId]);
 
   const handleEditProfile = React.useCallback(async (user: any) => {
     console.log(`Editando esse usuário: ${userId}, com esse token: ${token}`);
     await userService.editUser(userId!, token!, user?.username, user?.email);
-    console.log('editado');
+    Notification("Usuário editado com sucesso", "success");
+    setOpenProfileModal(false);
   }, [userId]);
 
   const formik = useFormik({
@@ -167,7 +190,7 @@ function Navbar() {
                 sx={{ display: { xs: 'block', md: 'none' } }}
               >
                 {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
+                  <MenuItem key={page} onClick={() => { handleClickPages(page); handleCloseNavMenu() }}>
                     <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                   </MenuItem>
                 ))}
@@ -177,7 +200,7 @@ function Navbar() {
               {pages.map((page) => (
                 <Button
                   key={page}
-                  onClick={handleCloseNavMenu}
+                  onClick={() => { handleClickPages(page); handleCloseNavMenu() }}
                   sx={{ my: 2, color: 'white', display: 'block' }}
                 >
                   {page}
