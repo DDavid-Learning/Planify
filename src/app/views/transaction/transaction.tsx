@@ -116,7 +116,7 @@ const Transaction = () => {
                     </Button>
                     <Button sx={{ color: theme.COLORS.PURPLE3 }} onClick={() => setOpenRegisterTransaction(true)}>
                         <AddIcon />
-                        <Typography sx={{ fontSize: "0.8pc", marginLeft: "0.5rem", marginTop: "4px" }}>Adicionar categoria</Typography>
+                        <Typography sx={{ fontSize: "0.8pc", marginLeft: "0.5rem", marginTop: "4px" }}>Adicionar Transação</Typography>
                     </Button>
                 </Box>
                 <Divider />
