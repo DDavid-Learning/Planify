@@ -3,7 +3,7 @@ import { Api } from "../api/api";
 
 const registerCategory = async (name: string, userId: string) => {
     try {
-        const response = await Api.post(CATEGORY, { name: name, userId: userId });
+        const response = await Api.post(CATEGORY, { name: name });
         return response.data;
     } catch (error) {
         throw error;
