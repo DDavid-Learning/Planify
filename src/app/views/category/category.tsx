@@ -23,8 +23,8 @@ import { RegisterCategory } from '../../../core/utils/validations';
 
 const Category = () => {
     const [openRegisterCategory, setOpenRegisterCategory] = useState(false);
+
     const userID = useAuth().userId;
-    
 
     const { data, isLoading, refetch, } = useQuery({
         queryKey: ['category', userID],
@@ -39,6 +39,7 @@ const Category = () => {
         ['ESTUDO', 300],
         ['TRABALHO', 200],
     ];
+
     const COLORS = ['#6E34B8', '#800080', '#5B259F', '#4B0082'];
 
     const options = {
@@ -100,8 +101,8 @@ const Category = () => {
                                         <CircularProgress />
                                     </Box>
                                 ) : data?.categories.length === 0 ? (
-                                    <Box sx={{ display: "flex", height: "100%", width: "100%",flex: 1, justifyContent: "center", alignItems: "center", flexDirection: "column", gap: "1rem", justifyItems: "center" }}> 
-                                        <CancelRoundedIcon sx={{  color: theme.COLORS.RED, fontSize: "3rem" }} />
+                                    <Box sx={{ display: "flex", height: "100%", width: "100%", flex: 1, justifyContent: "center", alignItems: "center", flexDirection: "column", gap: "1rem", justifyItems: "center" }}>
+                                        <CancelRoundedIcon sx={{ color: theme.COLORS.RED, fontSize: "3rem" }} />
                                         <Typography sx={{ fontSize: "0.8pc", color: theme.COLORS.PURPLE3 }}>Nenhuma categoria cadastrada</Typography>
                                     </Box>
                                 ) :

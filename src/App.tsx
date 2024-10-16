@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Login from "./app/views/login/login";
 import Register from "./app/views/register/register";
 import { AuthProvider } from "./core/context/auth/authContext";
@@ -16,9 +16,9 @@ function App() {
         <Route path="/registro" element={<Register />} />
         <Route path="*" element={<Navigate to="/login" />} />
         <Route element={<ProtectedRoutes />} >
-        <Route path="/home" element={<Home />} />
-        <Route path="/categorias" element={<Category />} />
-        <Route path="/transacoes" element={<Transaction />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/categorias" element={<Category />} />
+          <Route path="/transacoes" element={<Transaction />} />
         </Route>
       </Routes>
     </AuthProvider>

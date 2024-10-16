@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Container, Content, StyledTableCell, StyledTableHead } from '../styles'
 import { Box, Button, CircularProgress, Divider, FormControl, IconButton, InputAdornment, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -20,6 +20,7 @@ import { Notification } from '../../components/toastNotification/toastNotificati
 import { transactionService } from '../../../core/services/transaction/transactionService';
 import StyledStatus from '../../components/styledStatus/styledStatus';
 import { formatCurrencyBR, formatDateBr } from '../../../core/utils/globalFunctions';
+import { useAppContext } from '../../../core/context/user/userContext';
 
 export interface ITransaction {
     sender: string;
@@ -32,7 +33,8 @@ export interface ITransaction {
 }
 
 const Transaction = () => {
-    const [openRegisterTransaction, setOpenRegisterTransaction] = React.useState(false);
+    const { transactions, refetchUserData, isLoading, categories } = useAppContext();
+    const [openRegisterTransaction, setOpenRegisterTransaction] = useState(false);
     const userID = useAuth().userId;
 
     const [datePickerOpen, setDatePickerOpen] = useState(false)
@@ -47,34 +49,27 @@ const Transaction = () => {
         date: '',
     };
 
-    const { data, isLoading, refetch, } = useQuery({
-        queryKey: ['transaction', userID],
-        queryFn: () => userService.detailsUser(userID!),
-        enabled: !!userID,
-    });
     const [categorySelected, setCategorySelected] = useState<any>()
-
-
 
     const formik = useFormik({
         initialValues,
         validationSchema: RegisterTransaction,
         validateOnChange: false,
         onSubmit: (values) => {
-        const newValues = {
-            sender: formik.values.sender,
-            recipient: formik.values.recipient,
-            value: formik.values.value,
-            isExpense: formik.values.isExpense,
-            user: formik.values.user,
-            category: categorySelected.id,
-            date: formik.values.date
-        }
+            const newValues = {
+                sender: formik.values.sender,
+                recipient: formik.values.recipient,
+                value: formik.values.value,
+                isExpense: formik.values.isExpense,
+                user: formik.values.user,
+                category: categorySelected.id,
+                date: formik.values.date
+            }
             transactionService.registerTransaction(newValues).then((resp) => {
                 Notification("Transação adicionada com sucesso", "success")
                 formik.resetForm();
                 setOpenRegisterTransaction(false)
-                refetch();
+                refetchUserData();
             }).catch((error: any) => {
                 Notification("Erro ao adicionar Transação", "error")
             })
@@ -106,6 +101,10 @@ const Transaction = () => {
         { label: 'Entrada', value: false },
     ];
 
+    useEffect(() => {
+        refetchUserData();
+    }, []);
+
     return (
         <Container>
             <Content>
@@ -136,7 +135,7 @@ const Transaction = () => {
                             <TableBody>
 
                                 {isLoading ? (<TableRow><TableCell colSpan={6}><CircularProgress color="inherit" size={20} /></TableCell></TableRow>) :
-                                    (data?.transactions.map((transaction: any) => (
+                                    (transactions.map((transaction: any) => (
                                         <TableRow key={transaction.transactionId}>
                                             <TableCell>{transaction.sender}</TableCell>
                                             <TableCell>{transaction.recipient}</TableCell>
@@ -369,7 +368,7 @@ const Transaction = () => {
                                             <CircularProgress color="inherit" size={20} />
                                         </MenuItem>
                                     ) : (
-                                        data?.categories.map((option: any) => (
+                                        categories.map((option: any) => (
                                             <MenuItem key={option} value={option}>
                                                 {(String(option.name))}
                                             </MenuItem>
