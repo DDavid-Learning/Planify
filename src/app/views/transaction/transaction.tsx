@@ -21,7 +21,6 @@ import { transactionService } from '../../../core/services/transaction/transacti
 import StyledStatus from '../../components/styledStatus/styledStatus';
 import { formatCurrencyBR, formatDateBr } from '../../../core/utils/globalFunctions';
 import { useAppContext } from '../../../core/context/user/userContext';
-
 export interface ITransaction {
     sender: string;
     recipient: string;
@@ -32,12 +31,14 @@ export interface ITransaction {
     date: string;
 }
 
-const Transaction = () => {
-    const { transactions, refetchUserData, isLoading, categories } = useAppContext();
-    const [openRegisterTransaction, setOpenRegisterTransaction] = useState(false);
-    const userID = useAuth().userId;
+const options = [
+    { label: 'Saída', value: true },
+    { label: 'Entrada', value: false },
+];
 
-    const [datePickerOpen, setDatePickerOpen] = useState(false)
+const Transaction = () => {
+    const userID = useAuth().userId;
+    const { transactions, refetchUserData, isLoading, categories } = useAppContext();
 
     const initialValues: ITransaction = {
         sender: '',
@@ -48,8 +49,6 @@ const Transaction = () => {
         category: '',
         date: '',
     };
-
-    const [categorySelected, setCategorySelected] = useState<any>()
 
     const formik = useFormik({
         initialValues,
@@ -68,6 +67,7 @@ const Transaction = () => {
             transactionService.registerTransaction(newValues).then((resp) => {
                 Notification("Transação adicionada com sucesso", "success")
                 formik.resetForm();
+                setSelectedDate(null);
                 setOpenRegisterTransaction(false)
                 refetchUserData();
             }).catch((error: any) => {
@@ -76,30 +76,27 @@ const Transaction = () => {
         },
     });
 
+    const [categorySelected, setCategorySelected] = useState<any>()
+    const [isExpenseState, setIsExpenseState] = useState(false);
+    const [datePickerOpen, setDatePickerOpen] = useState(false)
+    const [openRegisterTransaction, setOpenRegisterTransaction] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(
+        formik.values.date
+            ? dayjs(formik.values.date, 'DD/MM/YYYY')
+            : null
+    );
+
+    const handleDateChange = (date: Dayjs | null) => {
+        setSelectedDate(date)
+        formik.setFieldValue('date', date ? date.format('DD/MM/YYYY') : '')
+    }
+
     const handleCloseModal = () => {
         setOpenRegisterTransaction(false)
         setCategorySelected("")
         setIsExpenseState(false)
         formik.resetForm();
     };
-
-
-    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(
-        formik.values.date
-            ? dayjs(formik.values.date, 'DD/MM/YYYY')
-            : null
-    )
-    const handleDateChange = (date: Dayjs | null) => {
-        setSelectedDate(date)
-        formik.setFieldValue('date', date ? date.format('DD/MM/YYYY') : '')
-    }
-
-    const [isExpenseState, setIsExpenseState] = useState(false);  // Defina o estado inicial como booleano (de acordo com as opções)
-
-    const options = [
-        { label: 'Saída', value: true },
-        { label: 'Entrada', value: false },
-    ];
 
     useEffect(() => {
         refetchUserData();

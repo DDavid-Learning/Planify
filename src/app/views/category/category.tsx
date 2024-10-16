@@ -1,49 +1,84 @@
-import React, { useState } from 'react'
-import { Container, Content } from '../styles'
-import { Box, Button, CircularProgress, Divider, Icon, IconButton, InputAdornment, Typography } from '@mui/material'
-import theme from '../../../core/theme/theme'
+import React, { useState, useEffect } from 'react';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AddIcon from '@mui/icons-material/Add';
-import DefaultModal from '../../components/defaultModal/defaultModal';
-import { useFormik } from 'formik';
-import GenericTextField from '../../components/genericTextField/genericTextField';
 import CategoryIcon from '@mui/icons-material/Category';
-import { useAuth } from '../../../core/context/auth/useAuth';
-import { categoryService } from '../../../core/services/category/categoryService';
-import { Notification } from '../../components/toastNotification/toastNotification';
 import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from '@mui/icons-material/Edit';
 import { useQuery } from '@tanstack/react-query';
-import { userService } from '../../../core/services/api/userService';
 import { Chart } from 'react-google-charts';
+import { Box, Button, CircularProgress, Divider, IconButton, InputAdornment, Typography } from '@mui/material';
+import { useFormik } from 'formik';
+
+import { Container, Content } from '../styles';
+import theme from '../../../core/theme/theme';
+import DefaultModal from '../../components/defaultModal/defaultModal';
+import GenericTextField from '../../components/genericTextField/genericTextField';
+import { useAuth } from '../../../core/context/auth/useAuth';
+import { categoryService } from '../../../core/services/category/categoryService';
+import { Notification } from '../../components/toastNotification/toastNotification';
+import { userService } from '../../../core/services/api/userService';
 import { RegisterCategory } from '../../../core/utils/validations';
-
-
 
 const Category = () => {
     const [openRegisterCategory, setOpenRegisterCategory] = useState(false);
+    const [expenseData, setExpenseData] = useState<[string, (string | number)][]>([['Categoria', 'Valor']]);
+    const [incomeData, setIncomeData] = useState<[string, (string | number)][]>([['Categoria', 'Valor']]);
 
     const userID = useAuth().userId;
 
-    const { data, isLoading, refetch, } = useQuery({
+    const { data, isLoading, refetch } = useQuery({
         queryKey: ['category', userID],
         queryFn: () => userService.detailsUser(userID!),
         enabled: !!userID,
     });
 
-    const dataCharts = [
-        ['Categoria', 'Valor'],
-        ['INVESTIMENTO', 700],
-        ['LAZER', 300],
-        ['ESTUDO', 300],
-        ['TRABALHO', 200],
-    ];
+    useEffect(() => {
+        if (data) {
+            const expenseMap = new Map();
+            const incomeMap = new Map();
+            let totalExpenses = 0;
+            let totalIncomes = 0;
+
+            data.transactions.forEach((transaction: any) => {
+                const categoryName = transaction.category.name;
+                if (transaction.isExpense) {
+                    totalExpenses += transaction.value;
+                    expenseMap.set(categoryName, (expenseMap.get(categoryName) || 0) + transaction.value);
+                } else {
+                    totalIncomes += transaction.value;
+                    incomeMap.set(categoryName, (incomeMap.get(categoryName) || 0) + transaction.value);
+                }
+            });
+
+            const processData = (map: Map<string, number>, total: number) => {
+                const resultArray: [string, number | string][] = [['Categoria', 'Valor']];
+                let otherValue = 0;
+
+                map.forEach((value, key) => {
+                    if (value / total < 0.1) {
+                        otherValue += value;
+                    } else {
+                        resultArray.push([key, value]);
+                    }
+                });
+
+                if (otherValue > 0) {
+                    resultArray.push(['Outros', otherValue]);
+                }
+
+                return resultArray;
+            };
+
+            setExpenseData(processData(expenseMap, totalExpenses));
+            setIncomeData(processData(incomeMap, totalIncomes));
+        }
+    }, [data]);
 
     const COLORS = ['#6E34B8', '#800080', '#5B259F', '#4B0082'];
 
     const options = {
-        title: 'Gastos por categoria',
+        title: 'Gastos',
         pieHole: 0.7,
         colors: COLORS,
         legend: { position: 'bottom' },
@@ -51,7 +86,7 @@ const Category = () => {
     };
 
     const options2 = {
-        title: 'Transações por categoria',
+        title: 'Entrada',
         pieHole: 0.7,
         colors: COLORS,
         legend: { position: 'bottom' },
@@ -66,13 +101,13 @@ const Category = () => {
         validateOnChange: false,
         onSubmit: (values) => {
             categoryService.registerCategory(values.name, userID!).then((resp) => {
-                Notification("Categoria adicionada com sucesso", "success")
-                formik.setFieldValue("name", "")
-                setOpenRegisterCategory(false)
+                Notification("Categoria adicionada com sucesso", "success");
+                formik.setFieldValue("name", "");
+                setOpenRegisterCategory(false);
                 refetch();
             }).catch((error: any) => {
-                Notification("Erro ao adicionar categoria", "error")
-            })
+                Notification("Erro ao adicionar categoria", "error");
+            });
         },
     });
 
@@ -121,20 +156,17 @@ const Category = () => {
                                                     <DeleteIcon />
                                                 </IconButton>
                                             </Box>
-
-
-                                        </Box>)
-                                    )
+                                        </Box>
+                                    ))
                                 }
                             </Box>
                         </Box>
-
                     </Box>
-                    <Box sx={{ display: "flex", flex: 7, }}>
+                    <Box sx={{ display: "flex", flex: 7 }}>
                         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "60%" }}>
                             <Chart
                                 chartType="PieChart"
-                                data={dataCharts}
+                                data={expenseData}
                                 options={options}
                                 width="100%"
                                 height="100%"
@@ -143,7 +175,7 @@ const Category = () => {
                         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "60%" }}>
                             <Chart
                                 chartType="PieChart"
-                                data={dataCharts}
+                                data={incomeData}
                                 options={options2}
                                 width="100%"
                                 height="100%"
@@ -153,17 +185,13 @@ const Category = () => {
                 </Box>
             </Content>
 
-
             <DefaultModal
                 title='Adicionar Categoria'
                 isOpen={openRegisterCategory}
                 onClose={() => setOpenRegisterCategory(false)}
                 onOpen={() => setOpenRegisterCategory(true)}
                 children={
-
                     <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", padding: "1rem" }}>
-
-
                         <GenericTextField<string>
                             label="Nome"
                             name="name"
@@ -182,8 +210,7 @@ const Category = () => {
                                 },
                             }}
                         />
-                        <Box sx={{ display: "flex", flexDirection: "row", gap: "1rem", width: "100%", justifyContent: "center", alignItems: "center", }}>
-
+                        <Box sx={{ display: "flex", flexDirection: "row", gap: "1rem", width: "100%", justifyContent: "center", alignItems: "center" }}>
                             <Button variant='contained' sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE, width: "100px" }} onClick={() => setOpenRegisterCategory(false)}>
                                 CANCELAR
                             </Button>
@@ -195,7 +222,7 @@ const Category = () => {
                 }
             />
         </Container>
-    )
-}
+    );
+};
 
-export default Category
+export default Category;
