@@ -1,5 +1,8 @@
 const API_URL = "http://localhost:8080";
 
+export const DOWNLOAD_PDF = `${API_URL}/v1/report/export-pdf`;
+export const DOWNLOAD_CSV = `${API_URL}/v1/report/export-csv`;
+
 export const EDIT_USER = `${API_URL}/v1/users/me`;
 export const RMV_USER = `${API_URL}/v1/users/me`;
 export const REGISTER_USER = `${API_URL}/v1/auth/register`;

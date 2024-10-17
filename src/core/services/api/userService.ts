@@ -1,9 +1,30 @@
+import { Dayjs } from "dayjs";
 import {
   DETAILS_USER,
   EDIT_USER,
   REGISTER_USER,
+  DOWNLOAD_CSV,
+  DOWNLOAD_PDF,
 } from "../../constants/constants";
 import { Api } from "./api";
+
+const exportTransactions = async (
+  type = "csv",
+  startDate: Dayjs,
+  endDate: Dayjs
+) => {
+  try {
+    const response = await Api.get(DOWNLOAD_CSV, {
+      params: {
+        startDate: startDate.format("YYYY-MM-DD"),
+        endDate: endDate.format("YYYY-MM-DD"),
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 const rmvUser = async (token: string, userId?: string) => {
   try {
@@ -13,6 +34,7 @@ const rmvUser = async (token: string, userId?: string) => {
     throw error;
   }
 };
+
 const editUser = async (
   userId: string,
   token: string,
@@ -64,4 +86,5 @@ export const userService = {
   detailsUser,
   editUser,
   rmvUser,
+  exportTransactions,
 };
