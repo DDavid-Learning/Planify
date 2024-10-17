@@ -29,7 +29,7 @@ import DefaultDialog from '../defaultDialog/defaultDialog';
 import { Notification } from '../toastNotification/toastNotification';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const pages = ['Dashboard', 'Transações', 'Metas', 'Categorias'];
+const pages = ['Dashboard', 'Transações', 'Metas', 'Categorias', "Relatório"];
 const settings = ['Perfil', 'Sair'];
 
 function Navbar() {
@@ -62,6 +62,9 @@ function Navbar() {
       case "Categorias":
         navigate("/categorias");
         break;
+      case "Relatório":
+        navigate("/download-pdf");
+        break;
       default:
         break;
     }
@@ -77,6 +80,8 @@ function Navbar() {
         return "/metas";
       case "Categorias":
         return "/categorias";
+      case "Relatório":
+        return "/download-pdf"
       default:
         return "/";
     }
