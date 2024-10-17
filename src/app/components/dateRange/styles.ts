@@ -14,7 +14,7 @@ export const Display = styled(Typography)`
   cursor: pointer;
   &:hover {
     background-color: #fff;
-    border: 2px solid ${theme.COLORS.PURPLE3};};
+    border: 2px solid ${theme.COLORS.PURPLE3};
     color: ${theme.COLORS.PURPLE3};
   }
 `;

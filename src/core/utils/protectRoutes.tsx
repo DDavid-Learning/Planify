@@ -2,13 +2,12 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/auth/useAuth";
 import { Box } from "@mui/material";
 import Navbar from "../../app/components/navbar/navbar";
-import theme from "../theme/theme";
 
 
 export const ProtectedRoutes = () => {
     const auth = useAuth()
     const { isLogoutDialogOpen, closeLogoutDialog, logout } = useAuth();
-    
+
 
     const handleLogout = () => {
         <Navigate to="/login" />
@@ -21,9 +20,15 @@ export const ProtectedRoutes = () => {
     }
 
     return (
-        <Box sx={{ display: "flex", flex: 1, overflowX: "hidden", flexDirection: "column" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
             <Navbar />
-            <Box sx={{ display: "flex", flex: 1}}>
+            <Box
+                sx={{
+                    flex: 1,
+                    overflowY: "auto", // Permite o scroll vertical se necessário
+                    padding: 2, // Opcional: adicionar um espaçamento
+                }}
+            >
                 <Outlet />
             </Box>
         </Box>

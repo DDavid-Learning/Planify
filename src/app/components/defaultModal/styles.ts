@@ -1,5 +1,6 @@
 import { Button, Typography } from "@mui/material";
 import styled from "styled-components";
+import theme from "../../../core/theme/theme";
 
 export const Overlay = styled.div<{ $small?: boolean }>`
   display: flex;
@@ -17,20 +18,6 @@ export const Overlay = styled.div<{ $small?: boolean }>`
 
 export const ModalContainer = styled.div`
   position: relative;
-  @media (min-width: 768px) {
-    width: 66.66667%;
-  }
-  @media (min-width: 1024px) {
-    width: 60%;
-  }
-  @media (min-width: 1280px) {
-    width: 40%;
-  }
-  margin: 6rem auto;
-  height: 100%;
-  @media (min-width: 1024px) {
-    height: auto;
-  }
 `;
 
 export const ModalContent = styled.div<{ $showModal: boolean }>`
@@ -98,8 +85,8 @@ export const ModalFooter = styled.div`
 `;
 
 export const ContentTitle = styled(Typography)`
-    color: ${({ theme }) => theme.COLORS.PURPLE4} !important;
-    font-size: 1.7rem !important;
-    font-weight: bold !important;
-    padding-left: 1rem;
-`
+  color: ${theme.COLORS.PURPLE4} !important;
+  font-size: 1.7rem !important;
+  font-weight: bold !important;
+  padding-left: 1rem;
+`;

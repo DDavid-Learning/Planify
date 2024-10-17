@@ -9,8 +9,6 @@ export interface ICategory {
 }
 
 interface AppContextProps {
-  exampleState: string;
-  setExampleState: React.Dispatch<React.SetStateAction<string>>;
   transactions: ITransaction[];
   setTransactions: React.Dispatch<React.SetStateAction<ITransaction[]>>;
   categories: ICategory[];
@@ -22,7 +20,6 @@ interface AppContextProps {
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [exampleState, setExampleState] = useState<string>('default value');
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const userID = useAuth().userId;
@@ -45,7 +42,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [data]);
 
   return (
-    <AppContext.Provider value={{ exampleState, setExampleState, transactions, setTransactions, categories, setCategories, refetchUserData, isLoading: queryLoading }}>
+    <AppContext.Provider value={{ transactions, setTransactions, categories, setCategories, refetchUserData, isLoading: queryLoading }}>
       {children}
     </AppContext.Provider>
   );

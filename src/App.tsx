@@ -19,6 +19,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/categorias" element={<Category />} />
           <Route path="/transacoes" element={<Transaction />} />
+          <Route path="/metas" element={<Transaction />} />
         </Route>
       </Routes>
     </AuthProvider>

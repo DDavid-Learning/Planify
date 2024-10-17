@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import { Container, Content, StyledTableCell, StyledTableHead } from '../styles'
-import { Box, Button, CircularProgress, Divider, FormControl, IconButton, InputAdornment, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { StyledTableCell, StyledTableHead } from '../styles'
+import { Box, Button, CircularProgress, Divider, FormControl, IconButton, InputAdornment, MenuItem, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography } from '@mui/material'
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
 import theme from '../../../core/theme/theme';
@@ -8,8 +8,6 @@ import DefaultModal from '../../components/defaultModal/defaultModal';
 import GenericTextField from '../../components/genericTextField/genericTextField';
 import { getIn, useFormik } from 'formik';
 import { RegisterTransaction } from '../../../core/utils/validations';
-import { useQuery } from '@tanstack/react-query';
-import { userService } from '../../../core/services/api/userService';
 import { useAuth } from '../../../core/context/auth/useAuth';
 import { DateField, LocalizationProvider } from '@mui/x-date-pickers';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -21,6 +19,7 @@ import { transactionService } from '../../../core/services/transaction/transacti
 import StyledStatus from '../../components/styledStatus/styledStatus';
 import { formatCurrencyBR, formatDateBr } from '../../../core/utils/globalFunctions';
 import { useAppContext } from '../../../core/context/user/userContext';
+
 export interface ITransaction {
     sender: string;
     recipient: string;
@@ -103,52 +102,46 @@ const Transaction = () => {
     }, []);
 
     return (
-        <Container>
-            <Content>
-                <Box sx={{ display: "flex", flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                    <Button sx={{ color: theme.COLORS.PURPLE3 }}>
-                        <FilterListIcon />
-                        <Typography sx={{ fontSize: "0.8pc", marginLeft: "0.5rem", marginTop: "4px" }}>Filtros</Typography>
-                    </Button>
-                    <Button sx={{ color: theme.COLORS.PURPLE3 }} onClick={() => setOpenRegisterTransaction(true)}>
-                        <AddIcon />
-                        <Typography sx={{ fontSize: "0.8pc", marginLeft: "0.5rem", marginTop: "4px" }}>Adicionar Transação</Typography>
-                    </Button>
-                </Box>
-                <Divider />
-                <Box sx={{ display: "flex", flex: 8, flexDirection: "row" }}>
-                    <TableContainer >
-                        <Table stickyHeader>
-                            <StyledTableHead>
-                                <TableRow>
-                                    <StyledTableCell>Remetente</StyledTableCell>
-                                    <StyledTableCell>Destinatário</StyledTableCell>
-                                    <StyledTableCell>Data</StyledTableCell>
-                                    <StyledTableCell>Valor</StyledTableCell>
-                                    <StyledTableCell>Tipo</StyledTableCell>
-                                    <StyledTableCell>Categoria</StyledTableCell>
-                                </TableRow>
-                            </StyledTableHead>
-                            <TableBody>
+        <>
+            <Box sx={{ display: "flex", flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "end" }}>
+                <Button sx={{ color: theme.COLORS.PURPLE3 }} onClick={() => setOpenRegisterTransaction(true)}>
+                    <AddIcon />
+                    <Typography sx={{ fontSize: "0.8pc", marginLeft: "0.5rem", marginTop: "4px" }}>Adicionar Transação</Typography>
+                </Button>
+            </Box>
+            <Divider />
+            <Box sx={{ display: "flex", flex: 8, flexDirection: "row" }}>
+                <TableContainer >
+                    <Table stickyHeader>
+                        <StyledTableHead>
+                            <TableRow>
+                                <StyledTableCell>Remetente</StyledTableCell>
+                                <StyledTableCell>Destinatário</StyledTableCell>
+                                <StyledTableCell>Data</StyledTableCell>
+                                <StyledTableCell>Valor</StyledTableCell>
+                                <StyledTableCell>Tipo</StyledTableCell>
+                                <StyledTableCell>Categoria</StyledTableCell>
+                            </TableRow>
+                        </StyledTableHead>
+                        <TableBody>
 
-                                {isLoading ? (<TableRow><TableCell colSpan={6}><CircularProgress color="inherit" size={20} /></TableCell></TableRow>) :
-                                    (transactions.map((transaction: any) => (
-                                        <TableRow key={transaction.transactionId}>
-                                            <TableCell>{transaction.sender}</TableCell>
-                                            <TableCell>{transaction.recipient}</TableCell>
-                                            <TableCell>{formatDateBr(transaction.date) || 'Sem data'}</TableCell>
-                                            <TableCell>{formatCurrencyBR(transaction.value)}</TableCell>
-                                            <TableCell>
-                                                <StyledStatus status={transaction.isExpense ? 'Saída' : 'Entrada'} />
-                                            </TableCell>
-                                            <TableCell>{transaction.category.name}</TableCell>
-                                        </TableRow>
-                                    )))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Box>
-            </Content>
+                            {isLoading ? (<TableRow><TableCell colSpan={6}><CircularProgress color="inherit" size={20} /></TableCell></TableRow>) :
+                                (transactions.map((transaction: any) => (
+                                    <TableRow key={transaction.transactionId}>
+                                        <TableCell>{transaction.sender}</TableCell>
+                                        <TableCell>{transaction.recipient}</TableCell>
+                                        <TableCell>{formatDateBr(transaction.date) || 'Sem data'}</TableCell>
+                                        <TableCell>{formatCurrencyBR(transaction.value)}</TableCell>
+                                        <TableCell>
+                                            <StyledStatus status={transaction.isExpense ? 'Saída' : 'Entrada'} />
+                                        </TableCell>
+                                        <TableCell>{transaction.category.name}</TableCell>
+                                    </TableRow>
+                                )))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Box>
             <DefaultModal
                 title='Adicionar Transação'
                 isOpen={openRegisterTransaction}
@@ -387,7 +380,7 @@ const Transaction = () => {
                     </Box>
                 }
             />
-        </Container>
+        </>
     )
 }
 

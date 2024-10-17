@@ -14,10 +14,14 @@ const FullScreenContainer = ({ children }: Props) => {
   const isLoginPage = location.pathname === "/login" || location.pathname === "/registro";
   return (
     <ThemeProvider theme={theme}>
-      <LayoutContainer $isLoginPage={isLoginPage}>
-        <CssBaseline />
-        {children}
-      </LayoutContainer>
+      {
+        isLoginPage ? (
+          <LayoutContainer $isLoginPage={isLoginPage}>
+            {children}
+          </LayoutContainer>
+        ) : (
+          children)
+      }
     </ThemeProvider>
   );
 };

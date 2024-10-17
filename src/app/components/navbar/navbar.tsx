@@ -27,14 +27,15 @@ import { useFormik } from 'formik';
 import * as Yup from "yup";
 import DefaultDialog from '../defaultDialog/defaultDialog';
 import { Notification } from '../toastNotification/toastNotification';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const pages = ['Dashboard', 'Transações', 'Metas', 'Categorias'];
 const settings = ['Perfil', 'Sair'];
 
 function Navbar() {
-  const { logout, userId, token} = useAuth();
+  const { logout, userId, token } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [openProfileModal, setOpenProfileModal] = React.useState(false); // Estado para abrir/fechar modal
@@ -42,7 +43,7 @@ function Navbar() {
   const [showPassword, setShowPassword] = useState(false);
   const [confirmation, setConfirmation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   function togglePassword() {
     setShowPassword(!showPassword);
   }
@@ -56,7 +57,7 @@ function Navbar() {
         navigate("/transacoes");
         break;
       case "Metas":
-        navigate("/home");
+        navigate("/metas");
         break;
       case "Categorias":
         navigate("/categorias");
@@ -65,6 +66,21 @@ function Navbar() {
         break;
     }
   }
+
+  const getPageRoute = (page: string) => {
+    switch (page) {
+      case "Dashboard":
+        return "/home";
+      case "Transações":
+        return "/transacoes";
+      case "Metas":
+        return "/metas";
+      case "Categorias":
+        return "/categorias";
+      default:
+        return "/";
+    }
+  };
 
   const validationSchema = Yup.object().shape({
     username: Yup.string()
@@ -157,56 +173,33 @@ function Navbar() {
     <Box sx={{ display: 'flex', width: '100%' }}>
       <AppBar position="static" sx={{ backgroundColor: theme.COLORS.PURPLE4 }}>
         <Container maxWidth="xl">
-          <Toolbar disableGutters>
+          <Toolbar disableGutters sx={{ gap: 2 }}>
             <Box sx={{ borderRadius: "50%", backgroundColor: theme.COLORS.GRAY6, width: "50px", height: "50px", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <LoginLogo />
             </Box>
 
-            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenNavMenu}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorElNav}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-                open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
-                sx={{ display: { xs: 'block', md: 'none' } }}
-              >
-                {pages.map((page) => (
-                  <MenuItem key={page} onClick={() => { handleClickPages(page); handleCloseNavMenu() }}>
-                    <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
+            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+              {pages.map((page) => {
+                const isActive = location.pathname === getPageRoute(page); // Verifica se a rota é ativa
+                return (
+                  <Button
+                    key={page}
+                    onClick={() => handleClickPages(page)}
+                    sx={{
+                      my: 2,
+                      color: isActive ? theme.COLORS.PURPLE1 : 'white',
+                      backgroundColor: isActive ? theme.COLORS.WHITE : 'transparent',
+                      borderRadius: '5px',
+                      display: 'block',
+                      ':hover': { backgroundColor: theme.COLORS.PURPLE2, color: theme.COLORS.PURPLE1 },
+                    }}
+                  >
+                    {page}
+                  </Button>
+                );
+              })}
             </Box>
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
-                <Button
-                  key={page}
-                  onClick={() => { handleClickPages(page); handleCloseNavMenu() }}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
-                >
-                  {page}
-                </Button>
-              ))}
-            </Box>
+
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Abrir configurações">
                 <IconButton
@@ -246,14 +239,14 @@ function Navbar() {
         </Container>
       </AppBar>
 
-                <DefaultDialog
-                  isOpen={confirmation}
-                  title="Deletar Conta"
-                  onCloseAction={() => setConfirmation(false)}
-                  confirmAction={() => handleRmvUser()}
-                  confirmText="Deletar"
-                  body={<Typography sx={{ fontSize: "0.8pc" }}>Tem certeza que deseja deletar sua conta?</Typography>}
-                />
+      <DefaultDialog
+        isOpen={confirmation}
+        title="Deletar Conta"
+        onCloseAction={() => setConfirmation(false)}
+        confirmAction={() => handleRmvUser()}
+        confirmText="Deletar"
+        body={<Typography sx={{ fontSize: "0.8pc" }}>Tem certeza que deseja deletar sua conta?</Typography>}
+      />
 
       {/* Modal do Perfil */}
       <DefaultModal
