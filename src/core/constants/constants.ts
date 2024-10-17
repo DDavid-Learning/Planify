@@ -11,3 +11,5 @@ export const CATEGORY_ID = `${API_URL}/v1/categories/`;
 
 export const TRANSACTION = `${API_URL}/v1/transactions`;
 export const TRANSACTION_ID = `${API_URL}/v1/transactions/`;
+
+export const DOWNLOAD_PDF = `${API_URL}/v1/report/export-pdf`;

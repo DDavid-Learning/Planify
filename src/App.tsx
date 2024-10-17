@@ -6,6 +6,7 @@ import { ProtectedRoutes } from "./core/utils/protectRoutes";
 import Home from "./app/views/home/home";
 import Category from "./app/views/category/category";
 import Transaction from "./app/views/transaction/transaction";
+import DownloadPDF from "./app/views/download-pdf/download-pdf";
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/categorias" element={<Category />} />
           <Route path="/transacoes" element={<Transaction />} />
           <Route path="/metas" element={<Transaction />} />
+          <Route path="/download-pdf" element={<DownloadPDF />} />
         </Route>
       </Routes>
     </AuthProvider>
