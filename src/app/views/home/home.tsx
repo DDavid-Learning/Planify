@@ -53,6 +53,55 @@ const Home = () => {
     refetchUserData();
   }, []);
 
+  const updateChartData = (period: Period) => {
+    const filteredTransactions =
+      period === 'day' && selectedDay
+        ? transactions.filter((transaction) =>
+            dayjs(transaction.date).isSame(selectedDay, 'day')
+          )
+        : period === 'month' && selectedMonth
+        ? transactions.filter((transaction) =>
+            dayjs(transaction.date).isSame(selectedMonth, 'month')
+          )
+        : transactions.filter((transaction) =>
+            dayjs(transaction.date).isSame(dayjs(), period)
+          );
+  
+    let totalExpenses = 0;
+    let totalIncomes = 0;
+  
+    filteredTransactions.forEach((transaction) => {
+      if (transaction.isExpense) {
+        totalExpenses += transaction.value;
+      } else {
+        totalIncomes += transaction.value;
+      }
+    });
+  
+    setChartData((prev) => ({
+      ...prev,
+      [period]:
+        totalExpenses === 0 && totalIncomes === 0
+          ? []
+          : [
+              ['Tipo', 'Valor'],
+              ['Despesas', totalExpenses],
+              ['Receitas', totalIncomes],
+            ],
+    }));
+  };
+
+  
+  
+  useEffect(() => {
+    updateChartData('day');
+    updateChartData('month');
+    updateChartData('week');
+    updateChartData('year');
+  }, [transactions, selectedDay, selectedMonth]);
+  
+
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
       {/* Botão e Seletores de Data no Meio da Página */}
