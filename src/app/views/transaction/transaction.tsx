@@ -3,6 +3,7 @@ import { StyledTableCell, StyledTableHead } from '../styles'
 import { Box, Button, CircularProgress, Divider, FormControl, IconButton, InputAdornment, MenuItem, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography } from '@mui/material'
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import theme from '../../../core/theme/theme';
 import DefaultModal from '../../components/defaultModal/defaultModal';
 import GenericTextField from '../../components/genericTextField/genericTextField';
@@ -97,6 +98,17 @@ const Transaction = () => {
         formik.resetForm();
     };
 
+    const handleDeleteTransaction = (transactionId: string) => {
+        transactionService.deleteTransaction(transactionId)
+            .then(() => {
+                Notification("Transação removida com sucesso", "success");
+                refetchUserData();
+            })
+            .catch((error: any) => {
+                Notification("Erro ao remover transação", error);
+            });
+    };
+
     useEffect(() => {
         refetchUserData();
     }, []);
@@ -121,12 +133,18 @@ const Transaction = () => {
                                 <StyledTableCell>Valor</StyledTableCell>
                                 <StyledTableCell>Tipo</StyledTableCell>
                                 <StyledTableCell>Categoria</StyledTableCell>
+                                <StyledTableCell>Ações</StyledTableCell>
                             </TableRow>
                         </StyledTableHead>
                         <TableBody>
-
-                            {isLoading ? (<TableRow><TableCell colSpan={6}><CircularProgress color="inherit" size={20} /></TableCell></TableRow>) :
-                                (transactions.map((transaction: any) => (
+                            {isLoading ? (
+                                <TableRow>
+                                    <TableCell colSpan={7}>
+                                        <CircularProgress color="inherit" size={20} />
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                transactions.map((transaction: any) => (
                                     <TableRow key={transaction.transactionId}>
                                         <TableCell>{transaction.sender}</TableCell>
                                         <TableCell>{transaction.recipient}</TableCell>
@@ -136,8 +154,22 @@ const Transaction = () => {
                                             <StyledStatus status={transaction.isExpense ? 'Saída' : 'Entrada'} />
                                         </TableCell>
                                         <TableCell>{transaction.category.name}</TableCell>
+                                        <TableCell>
+                                            <IconButton
+                                                onClick={() => handleDeleteTransaction(transaction.transactionId)}
+                                                sx={{
+                                                    color: theme.COLORS.PURPLE3,
+                                                    '&:hover': {
+                                                        color: theme.COLORS.RED
+                                                    }
+                                                }}
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </TableCell>
                                     </TableRow>
-                                )))}
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
