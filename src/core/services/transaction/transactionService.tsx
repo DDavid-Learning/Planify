@@ -15,7 +15,7 @@ const registerTransaction = async (transaction: any) => {
     }
 }
 
-// in transactionService.ts
+
 const deleteTransaction = async (transactionId: string) => {
     try {
         const response = await Api.delete(`${TRANSACTION_ID}${transactionId}`);
@@ -25,8 +25,17 @@ const deleteTransaction = async (transactionId: string) => {
     }
 }
 
+const updateTransaction = async (transactionId: string, editedValues: any) => {
+    try {
+        const response = await Api.put(`${TRANSACTION_ID}${transactionId}`, editedValues);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
 
 export const transactionService = {
     registerTransaction,
-    deleteTransaction
+    deleteTransaction,
+    updateTransaction
 }

@@ -4,6 +4,7 @@ import { Box, Button, CircularProgress, Divider, FormControl, IconButton, InputA
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import theme from '../../../core/theme/theme';
 import DefaultModal from '../../components/defaultModal/defaultModal';
 import GenericTextField from '../../components/genericTextField/genericTextField';
@@ -85,6 +86,8 @@ const Transaction = () => {
             ? dayjs(formik.values.date, 'DD/MM/YYYY')
             : null
     );
+    const [openEditTransaction, setOpenEditTransaction] = useState(false);
+    const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
 
     const handleDateChange = (date: Dayjs | null) => {
         setSelectedDate(date)
@@ -106,6 +109,54 @@ const Transaction = () => {
             })
             .catch((error: any) => {
                 Notification("Erro ao remover transação", error);
+            });
+    };
+
+    const handleEditTransaction = (transaction: any) => {
+        // Find the matching category from the categories array
+        const matchingCategory = categories.find(cat => cat.name === transaction.category.name);
+
+        setSelectedTransaction(transaction);
+        setSelectedDate(dayjs(transaction.date));
+        setCategorySelected(matchingCategory); // Set the matching category object
+        setIsExpenseState(transaction.isExpense);
+        formik.setValues({
+            sender: transaction.sender,
+            recipient: transaction.recipient,
+            value: transaction.value,
+            isExpense: transaction.isExpense,
+            user: userID!,
+            category: transaction.category.id,
+            date: formatDateBr(transaction.date),
+        });
+        setOpenEditTransaction(true);
+    };
+
+    const handleUpdateTransaction = (values: any) => {
+        // Convert the date from DD/MM/YYYY to YYYY-MM-DD
+        const dateParts = values.date.split('/');
+        const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+
+        const updatedValues = {
+            sender: values.sender,
+            recipient: values.recipient,
+            value: values.value,
+            isExpense: values.isExpense,
+            category: categorySelected.id,
+            date: formattedDate
+        }
+
+        transactionService.updateTransaction(selectedTransaction.transactionId, updatedValues)
+            .then(() => {
+                Notification("Transação atualizada com sucesso", "success");
+                setOpenEditTransaction(false);
+                setSelectedTransaction(null);
+                formik.resetForm();
+                setSelectedDate(null);
+                refetchUserData();
+            })
+            .catch((error: any) => {
+                Notification("Erro ao atualizar transação", "error");
             });
     };
 
@@ -155,18 +206,32 @@ const Transaction = () => {
                                         </TableCell>
                                         <TableCell>{transaction.category.name}</TableCell>
                                         <TableCell>
-                                            <IconButton
-                                                onClick={() => handleDeleteTransaction(transaction.transactionId)}
-                                                sx={{
-                                                    color: theme.COLORS.PURPLE3,
-                                                    '&:hover': {
-                                                        color: theme.COLORS.RED
-                                                    }
-                                                }}
-                                            >
-                                                <DeleteIcon />
-                                            </IconButton>
+                                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                                <IconButton
+                                                    onClick={() => handleEditTransaction(transaction)}
+                                                    sx={{
+                                                        color: theme.COLORS.PURPLE3,
+                                                        '&:hover': {
+                                                            color: theme.COLORS.BLUE
+                                                        }
+                                                    }}
+                                                >
+                                                    <EditIcon />
+                                                </IconButton>
+                                                <IconButton
+                                                    onClick={() => handleDeleteTransaction(transaction.transactionId)}
+                                                    sx={{
+                                                        color: theme.COLORS.PURPLE3,
+                                                        '&:hover': {
+                                                            color: theme.COLORS.RED
+                                                        }
+                                                    }}
+                                                >
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </Box>
                                         </TableCell>
+
                                     </TableRow>
                                 ))
                             )}
@@ -181,7 +246,7 @@ const Transaction = () => {
                 onOpen={() => setOpenRegisterTransaction(true)}
                 children={
 
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: "2rem", width: "100%", padding: "1rem" }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2rem', width: '90%', maxWidth: 600, padding: '1rem', margin: '0 auto' }}>
                         <Box sx={{ display: "flex", flexDirection: "row", gap: "1rem", width: "100%", justifyContent: "space-between", }}>
                             <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", justifyContent: "center", alignItems: "center" }}>
                                 <GenericTextField<string>
@@ -407,6 +472,260 @@ const Transaction = () => {
                             </Button>
                             <Button type='submit' onClick={() => formik.handleSubmit()} variant='contained' sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE, width: "100px" }}>
                                 Salvar
+                            </Button>
+                        </Box>
+                    </Box>
+                }
+            />
+
+            <DefaultModal
+                title='Editar Transação'
+                isOpen={openEditTransaction}
+                onClose={() => {
+                    setOpenEditTransaction(false);
+                    setSelectedTransaction(null);
+                    formik.resetForm();
+                }}
+                onOpen={() => setOpenEditTransaction(true)}
+                children={
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '2rem', width: '90%', maxWidth: 600, padding: '1rem', margin: '0 auto' }}>
+                        <Box sx={{ display: "flex", flexDirection: "row", gap: "1rem", width: "100%", justifyContent: "space-between", }}>
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", justifyContent: "center", alignItems: "center" }}>
+                                <GenericTextField<string>
+                                    label="Remetente"
+                                    name="sender"
+                                    value={formik.values.sender}
+                                    onChange={formik.handleChange}
+                                    error={!!formik.errors.sender}
+                                    helperText={formik.errors.sender}
+                                    props={{
+                                        fullWidth: true,
+                                        InputProps: {
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                </InputAdornment>
+                                            ),
+                                        },
+                                    }}
+                                />
+                                <GenericTextField<string>
+                                    label="Recebedor"
+                                    name="recipient"
+                                    value={formik.values.recipient}
+                                    onChange={formik.handleChange}
+                                    error={!!formik.errors.recipient}
+                                    helperText={formik.errors.recipient}
+                                    props={{
+                                        fullWidth: true,
+                                        InputProps: {
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                </InputAdornment>
+                                            ),
+                                        },
+                                    }}
+                                />
+                                <LocalizationProvider
+                                    dateAdapter={AdapterDayjs}
+                                    adapterLocale="pt-br"
+                                >
+                                    <FormControl
+                                        error={Boolean(
+                                            getIn(
+                                                formik.errors,
+                                                'date'
+                                            )
+                                        )}
+                                        fullWidth
+                                    >
+                                        <DateField
+                                            size="small"
+                                            variant="outlined"
+                                            label="Data"
+                                            value={selectedDate}
+                                            format="DD/MM/YYYY"
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <IconButton
+                                                            aria-label="toggle password visibility"
+                                                            onClick={() => setDatePickerOpen(true)}
+                                                            edge="end"
+                                                        >
+                                                            <CalendarMonthIcon sx={{ color: theme.COLORS.PURPLE3 }} />
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                            onChange={(event) =>
+                                                handleDateChange(event)
+                                            }
+                                            FormHelperTextProps={{
+                                                style: {
+                                                    margin: '1px 10px -5px '
+                                                }
+                                            }}
+                                        />
+                                        <DataPicker
+                                            isOpen={datePickerOpen}
+                                            onClose={() =>
+                                                setDatePickerOpen(false)
+                                            }
+                                            onOpen={() =>
+                                                setDatePickerOpen(true)
+                                            }
+                                            title="Escolher Data"
+                                            initialDate={selectedDate}
+                                            setInitialDate={
+                                                handleDateChange
+                                            }
+                                            typeOfDatePicker="data"
+                                        />
+                                    </FormControl>
+                                </LocalizationProvider>
+                            </Box>
+                            <Divider orientation="vertical" flexItem />
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%" }}>
+                                <Box sx={{ display: "flex", flexDirection: "row", gap: "0.7rem", width: "100%", justifyContent: "center" }}>
+                                    <GenericTextField<number>
+                                        label="Valor"
+                                        name="value"
+                                        value={formik.values.value}
+                                        onChange={formik.handleChange}
+                                        error={!!formik.errors.value}
+                                        helperText={formik.errors.value}
+                                        style={{ width: 110 }}
+                                        small
+                                        props={{
+                                            InputProps: {
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                    </InputAdornment>
+                                                ),
+                                            },
+                                        }}
+                                    />
+
+                                    <TextField
+                                        value={isExpenseState}
+                                        onChange={(e: any) => {
+                                            const response = e.target.value;
+                                            setIsExpenseState(response);
+                                            formik.setFieldValue('isExpense', response);
+                                        }}
+                                        id="outlined-select-state"
+                                        margin="none"
+                                        select
+                                        label="Tipo de Transação"
+                                        size="small"
+                                        style={{ width: 130 }}
+                                        name="isExpense"
+                                        error={Boolean(getIn(formik.errors, "isExpense"))}
+                                        helperText={getIn(formik.errors, "isExpense")}
+                                        SelectProps={{
+                                            MenuProps: {
+                                                PaperProps: {
+                                                    style: {
+                                                        maxHeight: 100,
+                                                    },
+                                                },
+                                            },
+                                            sx: {
+                                                textAlign: 'left',
+                                                '.MuiSelect-select': {
+                                                    textAlign: 'left',
+                                                },
+                                            },
+                                        }}
+                                        FormHelperTextProps={{
+                                            style: {
+                                                margin: '1px 10px -5px',
+                                            },
+                                        }}
+                                    >
+                                        {options.map((option: any) => (
+                                            <MenuItem key={option.value} value={option.value}>
+                                                {option.label}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                </Box>
+
+                                <TextField
+                                    value={categorySelected}
+                                    onChange={(e: any) => {
+                                        const category = e.target.value;
+                                        setCategorySelected(category);
+                                        formik.setFieldValue('category', category.categoryId);
+                                    }}
+                                    id="outlined-select-state"
+                                    margin="none"
+                                    select
+                                    label="Categoria"
+                                    size="small"
+                                    style={{ width: "100%" }}
+                                    name="category"
+                                    error={Boolean(getIn(formik.errors, "category"))}
+                                    helperText={getIn(formik.errors, "category")}
+                                    SelectProps={{
+                                        MenuProps: {
+                                            PaperProps: {
+                                                style: {
+                                                    maxHeight: 100,
+                                                },
+                                            },
+                                        },
+                                        sx: {
+                                            textAlign: 'left',
+                                            '.MuiSelect-select': {
+                                                textAlign: 'left',
+                                            },
+                                        },
+                                    }}
+                                    FormHelperTextProps={{
+                                        style: {
+                                            margin: '1px 10px -5px',
+                                        },
+                                    }}
+                                >
+                                    {isLoading ? (
+                                        <MenuItem disabled sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                            <CircularProgress color="inherit" size={20} />
+                                        </MenuItem>
+                                    ) : (
+                                        categories.map((option: any) => (
+                                            <MenuItem
+                                                key={option.id}
+                                                value={option}
+                                                selected={categorySelected?.id === option.id} // Add selected prop for comparison
+                                            >
+                                                {String(option.name)}
+                                            </MenuItem>
+                                        ))
+                                    )}
+                                </TextField>
+                            </Box>
+                        </Box>
+
+                        <Box sx={{ display: "flex", flexDirection: "row", gap: "1rem", width: "100%", justifyContent: "center", alignItems: "center", }}>
+                            <Button
+                                variant='contained'
+                                sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE, width: "100px" }}
+                                onClick={() => {
+                                    setOpenEditTransaction(false);
+                                    setSelectedTransaction(null);
+                                    formik.resetForm();
+                                }}
+                            >
+                                CANCELAR
+                            </Button>
+                            <Button
+                                type='submit'
+                                onClick={() => handleUpdateTransaction(formik.values)}
+                                variant='contained'
+                                sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE, width: "100px" }}
+                            >
+                                ATUALIZAR
                             </Button>
                         </Box>
                     </Box>
