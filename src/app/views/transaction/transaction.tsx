@@ -92,7 +92,6 @@ const Transaction = () => {
     const [openEditTransaction, setOpenEditTransaction] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
     const [showPendingTransactions, setShowPendingTransactions] = useState(true);
-    const [showCompleteTransactions, setShowCompleteTransactions] = useState(true);
 
     const handleDateChange = (date: Dayjs | null) => {
         setSelectedDate(date)
@@ -190,9 +189,7 @@ const Transaction = () => {
                 >
                     <FilterListIcon />
                     <Typography sx={{ fontSize: "0.8pc", marginLeft: "0.5rem", marginTop: "4px" }}>
-                        {showPendingTransactions && showCompleteTransactions
-                            ? "Esconder pendentes"
-                            : "Exibir pendentes"}
+                        {showPendingTransactions ? "Esconder pendentes" : "Exibir pendentes"}
                     </Typography>
                 </Button>
                 <Button sx={{ color: theme.COLORS.PURPLE3, marginLeft: "auto" }}
