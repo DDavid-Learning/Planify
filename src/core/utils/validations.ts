@@ -18,5 +18,6 @@ export const RegisterTransaction = Yup.object().shape({
         .required("Campo obrigatório"),
         user: Yup.string()
         .required("Campo obrigatório"),
-        date: Yup.string().required("Campo obrigatório")
+        date: Yup.string().required("Campo obrigatório"),
+        status: Yup.string().oneOf(['PENDING', 'COMPLETE']),
 });

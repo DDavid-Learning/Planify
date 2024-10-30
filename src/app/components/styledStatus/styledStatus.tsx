@@ -12,11 +12,11 @@ const StyledStatus = (props: IStyledStatus) => {
 
     const statusType = (status: string) => {
         switch (status) {
-            case "Entrada":
+            case "Receita":
                 return "green";
             case "CADASTRADO":
                 return "yellow";
-            case "Saída":
+            case "Despesa":
                 return "red";
             default:
                 return "default";

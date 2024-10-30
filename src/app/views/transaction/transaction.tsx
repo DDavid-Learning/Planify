@@ -30,11 +30,12 @@ export interface ITransaction {
     user: string;
     category: string;
     date: string;
+    status: string;
 }
 
 const options = [
-    { label: 'Saída', value: true },
-    { label: 'Entrada', value: false },
+    { label: 'Receita', value: false },
+    { label: 'Despesa', value: true }, 
 ];
 
 const Transaction = () => {
@@ -49,6 +50,7 @@ const Transaction = () => {
         user: userID!,
         category: '',
         date: '',
+        status: 'COMPLETE',
     };
 
     const formik = useFormik({
@@ -63,7 +65,8 @@ const Transaction = () => {
                 isExpense: formik.values.isExpense,
                 user: formik.values.user,
                 category: categorySelected.id,
-                date: formik.values.date
+                date: formik.values.date,
+                status: formik.values.status || "COMPLETE"
             }
             transactionService.registerTransaction(newValues).then((resp) => {
                 Notification("Transação adicionada com sucesso", "success")
@@ -88,6 +91,8 @@ const Transaction = () => {
     );
     const [openEditTransaction, setOpenEditTransaction] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+    const [showPendingTransactions, setShowPendingTransactions] = useState(true);
+    const [showCompleteTransactions, setShowCompleteTransactions] = useState(true);
 
     const handleDateChange = (date: Dayjs | null) => {
         setSelectedDate(date)
@@ -128,6 +133,7 @@ const Transaction = () => {
             user: userID!,
             category: transaction.category.id,
             date: formatDateBr(transaction.date),
+            status: transaction.status
         });
         setOpenEditTransaction(true);
     };
@@ -143,7 +149,8 @@ const Transaction = () => {
             value: values.value,
             isExpense: values.isExpense,
             category: categorySelected.id,
-            date: formattedDate
+            date: formattedDate,
+            status: values.status,
         }
 
         transactionService.updateTransaction(selectedTransaction.transactionId, updatedValues)
@@ -160,16 +167,40 @@ const Transaction = () => {
             });
     };
 
+    const handleToggleTransactionStatus = () => {
+        setShowPendingTransactions(!showPendingTransactions);
+    };
+
+    const rowStyle = (status: string) => ({
+        opacity: status === "PENDING" ? 0.8 : 1, // Grey out pending transactions
+    });
+
+    const cellStyle = { fontSize: '1.0rem' };
+
     useEffect(() => {
         refetchUserData();
     }, []);
 
     return (
         <>
-            <Box sx={{ display: "flex", flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "end" }}>
-                <Button sx={{ color: theme.COLORS.PURPLE3 }} onClick={() => setOpenRegisterTransaction(true)}>
+            <Box sx={{ display: "flex", flex: 1, flexDirection: "row", alignItems: "center" }}>
+                <Button
+                    sx={{ color: theme.COLORS.PURPLE3 }}
+                    onClick={handleToggleTransactionStatus}
+                >
+                    <FilterListIcon />
+                    <Typography sx={{ fontSize: "0.8pc", marginLeft: "0.5rem", marginTop: "4px" }}>
+                        {showPendingTransactions && showCompleteTransactions
+                            ? "Esconder pendentes"
+                            : "Exibir pendentes"}
+                    </Typography>
+                </Button>
+                <Button sx={{ color: theme.COLORS.PURPLE3, marginLeft: "auto" }}
+                    onClick={() => setOpenRegisterTransaction(true)}>
                     <AddIcon />
-                    <Typography sx={{ fontSize: "0.8pc", marginLeft: "0.5rem", marginTop: "4px" }}>Adicionar Transação</Typography>
+                    <Typography sx={{ fontSize: "0.8pc", marginLeft: "0.5rem", marginTop: "4px" }}>
+                        Adicionar Transação
+                    </Typography>
                 </Button>
             </Box>
             <Divider />
@@ -187,6 +218,7 @@ const Transaction = () => {
                                 <StyledTableCell>Ações</StyledTableCell>
                             </TableRow>
                         </StyledTableHead>
+
                         <TableBody>
                             {isLoading ? (
                                 <TableRow>
@@ -195,50 +227,56 @@ const Transaction = () => {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                transactions.map((transaction: any) => (
-                                    <TableRow key={transaction.transactionId}>
-                                        <TableCell>{transaction.sender}</TableCell>
-                                        <TableCell>{transaction.recipient}</TableCell>
-                                        <TableCell>{formatDateBr(transaction.date) || 'Sem data'}</TableCell>
-                                        <TableCell>{formatCurrencyBR(transaction.value)}</TableCell>
-                                        <TableCell>
-                                            <StyledStatus status={transaction.isExpense ? 'Saída' : 'Entrada'} />
-                                        </TableCell>
-                                        <TableCell>{transaction.category.name}</TableCell>
-                                        <TableCell>
-                                            <Box sx={{ display: 'flex', gap: 1 }}>
-                                                <IconButton
-                                                    onClick={() => handleEditTransaction(transaction)}
-                                                    sx={{
-                                                        color: theme.COLORS.PURPLE3,
-                                                        '&:hover': {
-                                                            color: theme.COLORS.BLUE
-                                                        }
-                                                    }}
-                                                >
-                                                    <EditIcon />
-                                                </IconButton>
-                                                <IconButton
-                                                    onClick={() => handleDeleteTransaction(transaction.transactionId)}
-                                                    sx={{
-                                                        color: theme.COLORS.PURPLE3,
-                                                        '&:hover': {
-                                                            color: theme.COLORS.RED
-                                                        }
-                                                    }}
-                                                >
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </Box>
-                                        </TableCell>
+                                transactions
+                                    .filter((transaction) =>
+                                        showPendingTransactions || transaction.status === 'COMPLETE'
+                                    )
+                                    .map((transaction: any) => (
+                                        <TableRow key={transaction.transactionId} style={{...rowStyle(transaction.status)}}>
+                                            <TableCell sx={cellStyle}>{transaction.sender}</TableCell>
+                                            <TableCell sx={cellStyle}>{transaction.recipient}</TableCell>
+                                            <TableCell sx={cellStyle}>{formatDateBr(transaction.date) || 'Sem data'}</TableCell>
+                                            <TableCell sx={cellStyle}>{formatCurrencyBR(transaction.value)}</TableCell>
+                                            <TableCell sx={cellStyle}>
+                                                <StyledStatus status={transaction.isExpense ? 'Despesa' : 'Receita'} />
+                                            </TableCell>
+                                            <TableCell sx={cellStyle}>{transaction.category.name}</TableCell>
+                                            <TableCell sx={cellStyle}>
+                                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                                    <IconButton
+                                                        onClick={() => handleEditTransaction(transaction)}
+                                                        sx={{
+                                                            color: theme.COLORS.PURPLE3,
+                                                            '&:hover': {
+                                                                color: theme.COLORS.BLUE
+                                                            }
+                                                        }}
+                                                    >
+                                                        <EditIcon />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        onClick={() => handleDeleteTransaction(transaction.transactionId)}
+                                                        sx={{
+                                                            color: theme.COLORS.PURPLE3,
+                                                            '&:hover': {
+                                                                color: theme.COLORS.RED
+                                                            }
+                                                        }}
+                                                    >
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </Box>
+                                            </TableCell>
 
-                                    </TableRow>
-                                ))
+                                        </TableRow>
+                                    )
+                                    )
                             )}
                         </TableBody>
                     </Table>
                 </TableContainer>
             </Box>
+
             <DefaultModal
                 title='Adicionar Transação'
                 isOpen={openRegisterTransaction}
@@ -450,6 +488,7 @@ const Transaction = () => {
                                         },
                                     }}
                                 >
+
                                     {isLoading ? (
                                         <MenuItem disabled sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                             <CircularProgress color="inherit" size={20} />
@@ -461,6 +500,45 @@ const Transaction = () => {
                                             </MenuItem>
                                         ))
                                     )}
+                                </TextField>
+
+                                <TextField
+                                    value={formik.values.status}
+                                    onChange={(e: any) => {
+                                        formik.setFieldValue('status', e.target.value);
+                                    }}
+                                    id="outlined-select-status"
+                                    margin="none"
+                                    select
+                                    label="Status"
+                                    size="small"
+                                    style={{ width: "100%" }}
+                                    name="status"
+                                    error={Boolean(getIn(formik.errors, "status"))}
+                                    helperText={getIn(formik.errors, "status")}
+                                    SelectProps={{
+                                        MenuProps: {
+                                            PaperProps: {
+                                                style: {
+                                                    maxHeight: 100,
+                                                },
+                                            },
+                                        },
+                                        sx: {
+                                            textAlign: 'left',
+                                            '.MuiSelect-select': {
+                                                textAlign: 'left',
+                                            },
+                                        },
+                                    }}
+                                    FormHelperTextProps={{
+                                        style: {
+                                            margin: '1px 10px -5px',
+                                        },
+                                    }}
+                                >
+                                    <MenuItem value="PENDING">PENDING</MenuItem>
+                                    <MenuItem value="COMPLETE">COMPLETE</MenuItem>
                                 </TextField>
                             </Box>
                         </Box>
@@ -703,6 +781,45 @@ const Transaction = () => {
                                             </MenuItem>
                                         ))
                                     )}
+                                </TextField>
+
+                                <TextField
+                                    value={formik.values.status}
+                                    onChange={(e: any) => {
+                                        formik.setFieldValue('status', e.target.value);
+                                    }}
+                                    id="outlined-select-status"
+                                    margin="none"
+                                    select
+                                    label="Status"
+                                    size="small"
+                                    style={{ width: "100%" }}
+                                    name="status"
+                                    error={Boolean(getIn(formik.errors, "status"))}
+                                    helperText={getIn(formik.errors, "status")}
+                                    SelectProps={{
+                                        MenuProps: {
+                                            PaperProps: {
+                                                style: {
+                                                    maxHeight: 100,
+                                                },
+                                            },
+                                        },
+                                        sx: {
+                                            textAlign: 'left',
+                                            '.MuiSelect-select': {
+                                                textAlign: 'left',
+                                            },
+                                        },
+                                    }}
+                                    FormHelperTextProps={{
+                                        style: {
+                                            margin: '1px 10px -5px',
+                                        },
+                                    }}
+                                >
+                                    <MenuItem value="PENDING">PENDING</MenuItem>
+                                    <MenuItem value="COMPLETE">COMPLETE</MenuItem>
                                 </TextField>
                             </Box>
                         </Box>
