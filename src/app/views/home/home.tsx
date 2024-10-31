@@ -139,7 +139,6 @@ const Home = () => {
 
       {/* Gráficos */}
       <Card sx={{ marginBottom: '15px', boxShadow: 3, padding: '16px' }}>
-        <CardHeader title="Visualização dos Dados" titleTypographyProps={{ variant: 'h5' }} />
         <CardContent>
           <Box
             sx={{
@@ -212,7 +211,7 @@ const Home = () => {
 
       {/* Baixar Transações */}
       <Card sx={{ marginBottom: '15px', boxShadow: 3, padding: '16px' }}> {/* Card para a seção de download */}
-        <CardHeader title="Baixar Transações por Período" titleTypographyProps={{ variant: 'h5' }} />
+        <CardHeader title="Exportar transações para CSV" titleTypographyProps={{ variant: 'h5' }} />
         <CardContent> {/* Conteúdo dentro do Card */}
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: '16px', flexDirection: { xs: 'column', sm: 'row' } }}> {/* Responsivo */}
             <DatePicker
