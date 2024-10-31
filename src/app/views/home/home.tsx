@@ -70,13 +70,15 @@ const Home = () => {
     let totalExpenses = 0;
     let totalIncomes = 0;
 
-    filteredTransactions.forEach((transaction) => {
-      if (transaction.isExpense) {
-        totalExpenses += transaction.value;
-      } else {
-        totalIncomes += transaction.value;
-      }
-    });
+    filteredTransactions
+      .filter((transaction) => transaction.status == "COMPLETE")
+      .forEach((transaction) => {
+        if (transaction.isExpense) {
+          totalExpenses += transaction.value;
+        } else {
+          totalIncomes += transaction.value;
+        }
+      });
 
     setChartData((prev) => ({
       ...prev,
@@ -123,13 +125,13 @@ const Home = () => {
 
             return (
               <Typography variant="h6" component="div">
-                <b style={{fontSize: "22px"}}>Saldo:</b>{" "}
+                <b style={{ fontSize: "22px" }}>Saldo:</b>{" "}
                 <span style={{ color: 'green' }}>
                   {totalIncomes.toFixed(2)}
                 </span> - <span style={{ color: 'red' }}>
                   {totalExpenses.toFixed(2)}
                 </span> = <span style={{ color: balance >= 0 ? 'green' : 'red' }}>
-                  <b style={{fontSize: "22px"}}>R$ {balance.toFixed(2)}</b>
+                  <b style={{ fontSize: "22px" }}>R$ {balance.toFixed(2)}</b>
                 </span>
               </Typography>
             );
