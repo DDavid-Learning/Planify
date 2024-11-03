@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Button, CircularProgress, Divider, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Divider, IconButton, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography } from "@mui/material";
 import * as Yup from 'yup';
 
 import { useAuth } from "../../../core/context/auth/useAuth";
@@ -20,16 +20,19 @@ const cellStyle = { fontSize: '1.0rem' };
 
 const Goals = () => {
   const userID = useAuth().userId;
+
   const { categories } = useAppContext();
-  const queryClient = useQueryClient();
 
+  const [openDepositModal, setOpenDepositModal] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState<TGoalResponse | null>(null);
+  const [depositAmount, setDepositAmount] = useState<number>(0);
   const [categorySelected, setCategorySelected] = useState<any>("");
-
   // Estado para controlar o modal de criar metas
   const [openRegisterGoal, setOpenRegisterGoal] = useState(false);
 
   // Funções de abertura e fechamento do modal
   const handleOpenModal = () => setOpenRegisterGoal(true);
+
   const handleCloseModal = () => {
     formik.resetForm();
     setCategorySelected("");
@@ -55,6 +58,28 @@ const Goals = () => {
       console.error("Erro ao criar meta:", error);
     },
   });
+
+  const handleOpenDepositModal = (goal: TGoalResponse) => {
+    setSelectedGoal(goal);
+    setDepositAmount(0);
+    setOpenDepositModal(true);
+  };
+
+  const handleCloseDepositModal = () => {
+    setOpenDepositModal(false);
+    setSelectedGoal(null);
+  };
+
+  const handleDepositSubmit = () => {
+    if (selectedGoal) {
+      GoalsService.updateGoal(selectedGoal.id, depositAmount)
+        .then(() => {
+          refetch();
+          handleCloseDepositModal();
+        })
+        .catch((error) => console.error("Erro ao adicionar valor à meta:", error));
+    }
+  };
 
   // Configuração do Formik e Yup para validação do formulário
   const formik = useFormik({
@@ -112,6 +137,7 @@ const Goals = () => {
                 <StyledTableCell>Data limite</StyledTableCell>
                 <StyledTableCell>Saldo atual</StyledTableCell>
                 <StyledTableCell>Meta</StyledTableCell>
+                <StyledTableCell></StyledTableCell>
               </TableRow>
             </StyledTableHead>
 
@@ -129,6 +155,18 @@ const Goals = () => {
                     <TableCell sx={cellStyle}>{formatDateBr(goal.targetDate)}</TableCell>
                     <TableCell sx={cellStyle}>{formatCurrencyBR(goal.currentAmount)}</TableCell>
                     <TableCell sx={cellStyle}>{formatCurrencyBR(goal.targetAmount)}</TableCell>
+                    <TableCell align="center">
+                      <IconButton
+                        onClick={() => handleOpenDepositModal(goal)}
+                        sx={{
+                          backgroundColor: theme.COLORS.PURPLE3,
+                          color: theme.COLORS.WHITE,
+                          ":hover": { color: theme.COLORS.PURPLE3 }
+                        }}
+                      >
+                        <AddIcon />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 ))
               )}
@@ -136,6 +174,32 @@ const Goals = () => {
           </Table>
         </TableContainer>
       </Box>
+
+      {/* Modal pra depositar em uma meta */}
+      <DefaultModal
+        title="Adicionar Depósito"
+        isOpen={openDepositModal}
+        onClose={handleCloseDepositModal}
+        onOpen={() => { }}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, padding: 2 }}>
+          <Typography>Meta: {selectedGoal?.name}</Typography>
+          <TextField
+            label="Valor do depósito"
+            type="number"
+            value={depositAmount}
+            onChange={(e) => setDepositAmount(Number(e.target.value))}
+            fullWidth
+          />
+          <Button
+            variant="contained"
+            onClick={handleDepositSubmit}
+            sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE }}
+          >
+            Depositar
+          </Button>
+        </Box>
+      </DefaultModal>
 
       {/* Modal de criação de meta */}
       <DefaultModal

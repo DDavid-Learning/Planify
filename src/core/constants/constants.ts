@@ -17,4 +17,4 @@ export const TRANSACTION_ID = `${API_URL}/v1/transactions/`;
 
 export const GOALS = `${API_URL}/v1/goals`;
 export const GET_GOAL = `${API_URL}/v1/goals/`;
-export const MANAGE_GOAL = `${API_URL}/v1/balance/`;
+export const MANAGE_GOAL = `${API_URL}/v1/goals/balance/`;
