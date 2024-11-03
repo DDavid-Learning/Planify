@@ -5,7 +5,6 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
@@ -100,7 +99,6 @@ function Navbar() {
 
   });
 
-
   useEffect(() => {
     const fetchUserDetails = async () => {
       setIsLoading(true);
@@ -150,15 +148,8 @@ function Navbar() {
     },
   });
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
   };
 
   const handleCloseUserMenu = () => {
@@ -177,71 +168,70 @@ function Navbar() {
   return (
     <Box sx={{ display: 'flex', width: '100%' }}>
       <AppBar position="static" sx={{ backgroundColor: theme.COLORS.PURPLE4 }}>
-        <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ gap: 2 }}>
-            <Box sx={{ borderRadius: "50%", backgroundColor: theme.COLORS.GRAY6, width: "50px", height: "50px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <LoginLogo />
-            </Box>
+        <Toolbar sx={{ gap: 2 }}>
+          <Box sx={{ borderRadius: "50%", backgroundColor: theme.COLORS.GRAY6, width: "50px", height: "50px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <LoginLogo />
+          </Box>
 
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-              {pages.map((page) => {
-                const isActive = location.pathname === getPageRoute(page); // Verifica se a rota é ativa
-                return (
-                  <Button
-                    key={page}
-                    onClick={() => handleClickPages(page)}
-                    sx={{
-                      my: 2,
-                      color: isActive ? theme.COLORS.PURPLE1 : 'white',
-                      backgroundColor: isActive ? theme.COLORS.WHITE : 'transparent',
-                      borderRadius: '5px',
-                      display: 'block',
-                      ':hover': { backgroundColor: theme.COLORS.PURPLE2, color: theme.COLORS.PURPLE1 },
-                    }}
-                  >
-                    {page}
-                  </Button>
-                );
-              })}
-            </Box>
-
-            <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Abrir configurações">
-                <IconButton
-                  onClick={handleOpenUserMenu}
-                  sx={{ background: theme.COLORS.GRAY5, ':hover': { background: theme.COLORS.GRAY4 } }}
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+            {pages.map((page) => {
+              const isActive = location.pathname === getPageRoute(page);
+              return (
+                <Button
+                  key={page}
+                  onClick={() => handleClickPages(page)}
+                  sx={{
+                    my: 2,
+                    textTransform: 'none',
+                    color: isActive ? theme.COLORS.PURPLE1 : 'white',
+                    backgroundColor: isActive ? theme.COLORS.WHITE : 'transparent',
+                    borderRadius: '5px',
+                    display: 'block',
+                    ':hover': { backgroundColor: theme.COLORS.PURPLE2, color: theme.COLORS.PURPLE1 },
+                  }}
                 >
-                  <PersonIcon sx={{ color: theme.COLORS.PURPLE4 }} />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
+                  {page}
+                </Button>
+              );
+            })}
+          </Box>
+
+          <Box sx={{ flexGrow: 0 }}>
+            <Tooltip title="Abrir configurações">
+              <IconButton
+                onClick={handleOpenUserMenu}
+                sx={{ background: theme.COLORS.GRAY5, ':hover': { background: theme.COLORS.GRAY4 } }}
               >
-                {settings.map((setting) => (
-                  <MenuItem
-                    key={setting}
-                    onClick={setting === 'Perfil' ? handleOpenProfileModal : setting === 'Sair' ? logout : handleCloseUserMenu}
-                  >
-                    <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-          </Toolbar>
-        </Container>
+                <PersonIcon sx={{ color: theme.COLORS.PURPLE4 }} />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              sx={{ mt: '45px' }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+            >
+              {settings.map((setting) => (
+                <MenuItem
+                  key={setting}
+                  onClick={setting === 'Perfil' ? handleOpenProfileModal : setting === 'Sair' ? logout : handleCloseUserMenu}
+                >
+                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
+        </Toolbar>
       </AppBar>
 
       <DefaultDialog
