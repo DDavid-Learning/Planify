@@ -29,6 +29,26 @@ const Home = () => {
     year: [['Tipo', 'Valor']],
   });
 
+  // calcula despesas, receitas e saldo geral
+  const expenses = useMemo(
+    () =>
+      transactions
+        .filter((transaction) => transaction.status === 'COMPLETE' && transaction.isExpense)
+        .reduce((acc, transaction) => acc + transaction.value, 0),
+    [transactions]
+  );
+
+  const incomes = useMemo(
+    () =>
+      transactions
+        .filter((transaction) => transaction.status === 'COMPLETE' && !transaction.isExpense)
+        .reduce((acc, transaction) => acc + transaction.value, 0),
+    [transactions]
+  );
+
+  const balance = useMemo(() => incomes - expenses, [incomes, expenses]);
+
+  // exportar o csv de um periodo
   const handleDownloadCsv = async () => {
     try {
       if (startDate && endDate) {
@@ -48,12 +68,7 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    refetchUserData();
-  }, []);
-
-
-
+  // filtra as transacoes pros graficos
   const updateChartData = (period: Period) => {
     const date = selectedDate || dayjs();
 
@@ -93,30 +108,15 @@ const Home = () => {
   };
 
   useEffect(() => {
+    refetchUserData();
+  }, []);
+
+  useEffect(() => {
     updateChartData('day');
     updateChartData('week');
     updateChartData('month');
     updateChartData('year');
   }, [transactions, selectedDate]);
-
-
-  const expenses = useMemo(
-    () =>
-      transactions
-        .filter((transaction) => transaction.status === 'COMPLETE' && transaction.isExpense)
-        .reduce((acc, transaction) => acc + transaction.value, 0),
-    [transactions]
-  );
-
-  const incomes = useMemo(
-    () =>
-      transactions
-        .filter((transaction) => transaction.status === 'COMPLETE' && !transaction.isExpense)
-        .reduce((acc, transaction) => acc + transaction.value, 0),
-    [transactions]
-  );
-
-  const balance = useMemo(() => incomes - expenses, [incomes, expenses]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
@@ -137,7 +137,7 @@ const Home = () => {
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
               gap: '32px',
             }}
           >
