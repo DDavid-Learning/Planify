@@ -57,7 +57,6 @@ const Transaction = () => {
         isGoalContribution: false,
     };
 
-
     const formik = useFormik({
         initialValues,
         validationSchema: RegisterTransaction,

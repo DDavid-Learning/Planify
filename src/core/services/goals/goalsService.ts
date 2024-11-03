@@ -1,9 +1,10 @@
 import { GET_GOAL, GOALS, MANAGE_GOAL } from "../../constants/constants";
+import { TGoal } from "../../models/goalModel";
 import { Api } from "../api/api";
 
-const createGoal = async () => {
+const createGoal = async (goal: TGoal) => {
   try {
-    const response = await Api.post(GOALS);
+    const response = await Api.post(GOALS, goal);
     return response.data;
   } catch (error) {
     throw error;
