@@ -7,6 +7,7 @@ import Home from "./app/views/home/home";
 import Category from "./app/views/category/category";
 import Transaction from "./app/views/transaction/transaction";
 import DownloadPDF from "./app/views/download-pdf/download-pdf";
+import Goals from "./app/views/goals/Goals";
 
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/categorias" element={<Category />} />
           <Route path="/transacoes" element={<Transaction />} />
-          <Route path="/metas" element={<Transaction />} />
+          <Route path="/metas" element={<Goals />} />
           <Route path="/download-pdf" element={<DownloadPDF />} />
         </Route>
       </Routes>
