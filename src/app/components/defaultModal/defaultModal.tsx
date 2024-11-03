@@ -4,14 +4,11 @@ import React from "react";
 import theme from "../../../core/theme/theme";
 import { ContentTitle } from "./styles";
 
-
 const style = {
   bgcolor: "#fff",
   borderRadius: 1,
   boxShadow: 24,
   zIndex: 1000,
-  borderLeft: `4px solid`,
-  borderLeftColor: theme.COLORS.PURPLE3,
 };
 
 export interface IModalProps {
@@ -53,24 +50,16 @@ const DefaultModal = (props: IModalProps) => {
             <ContentTitle>{props.title}</ContentTitle>
             <IconButton
               sx={{
-                ":hover": { color: theme.COLORS.PURPLE3,
-                 },
+                ":hover": {
+                  color: theme.COLORS.PURPLE3,
+                },
               }}
               onClick={props.onClose}
             >
               <CloseIcon />
             </IconButton>
           </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignContent: "center",
-            }}
-          >
-            {props.children}
-          </Box>
+          {props.children}
         </Box>
       </Fade>
     </Modal>

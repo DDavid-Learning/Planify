@@ -38,7 +38,7 @@ function GenericTextField<T>({
     onChange,
     style,
     onChangeManual,
-    inputMode 
+    inputMode
 }: TDefaultTextField<T>) {
 
     return (

@@ -160,9 +160,10 @@ const Category = () => {
                                 gap: "0.5rem",
                                 display: "flex",
                                 flexDirection: "column",
-                                flex: 1
+                                flex: 1,
+                                overflowY: "scroll",
+                                overflowX: "hidden"
                             }}>
-
                                 {isLoading ? (
                                     <Box sx={{ display: "flex", height: "100%", width: "100%", justifyContent: "center", alignItems: "center" }}>
                                         <CircularProgress />
@@ -175,19 +176,18 @@ const Category = () => {
                                 ) :
                                     (data?.categories.map((item: any, index: number) =>
                                         <Box sx={{
-                                            display: "flex", flexDirection: "row", gap: "1rem", width: "100%", justifyContent: "space-between",
-                                            alignItems: "center", border: "2px solid", borderColor: theme.COLORS.PURPLE4, borderRadius: "10px",
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            gap: "1rem",
+                                            width: "100%",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            border: "2px solid",
+                                            borderColor: theme.COLORS.GRAY5,
+                                            borderRadius: "10px",
                                             backgroundColor: theme.COLORS.GRAY7
                                         }} key={index}>
-                                            <Typography sx={{ fontWeight: "bold", color: theme.COLORS.PURPLE3, marginLeft: "10px" }}>{item.name}</Typography>
-                                            <Box>
-                                                <IconButton sx={{ backgroundColor: theme.COLORS.GRAY7, color: theme.COLORS.PURPLE3, ":hover": { backgroundColor: theme.COLORS.PURPLE2 } }}>
-                                                    <EditIcon />
-                                                </IconButton>
-                                                <IconButton sx={{ backgroundColor: theme.COLORS.GRAY7, color: theme.COLORS.RED, ":hover": { backgroundColor: theme.COLORS.PURPLE2 } }}>
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </Box>
+                                            <Typography sx={{ color: theme.COLORS.BLACK }}>{item.name}</Typography>
                                         </Box>
                                     ))
                                 }
@@ -219,13 +219,19 @@ const Category = () => {
                 </Box>
             </Box>
 
+            {/* cadastro de categoria */}
             <DefaultModal
                 title='Adicionar Categoria'
                 isOpen={openRegisterCategory}
                 onClose={() => setOpenRegisterCategory(false)}
                 onOpen={() => setOpenRegisterCategory(true)}
                 children={
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", padding: "1rem" }}>
+                    <Box sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 2,
+                        padding: 2
+                    }}>
                         <GenericTextField<string>
                             label="Nome"
                             name="name"
@@ -233,21 +239,39 @@ const Category = () => {
                             onChange={formik.handleChange}
                             error={!!formik.errors.name}
                             helperText={formik.errors.name}
-                            props={{
-                                InputProps: {
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <CategoryIcon />
-                                        </InputAdornment>
-                                    ),
-                                },
-                            }}
                         />
-                        <Box sx={{ display: "flex", flexDirection: "row", gap: "1rem", width: "100%", justifyContent: "center", alignItems: "center" }}>
-                            <Button variant='contained' sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE, width: "100px" }} onClick={() => setOpenRegisterCategory(false)}>
-                                CANCELAR
+
+                        {/* footer do modal */}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: "row",
+                                gap: "1rem",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <Button
+                                variant='contained'
+                                sx={{
+                                    backgroundColor: theme.COLORS.PURPLE3,
+                                    color: theme.COLORS.WHITE,
+                                    width: "100px",
+                                    textTransform: "none"
+                                }}
+                                onClick={() => setOpenRegisterCategory(false)}
+                            >
+                                Cancelar
                             </Button>
-                            <Button type='submit' onClick={() => formik.handleSubmit()} variant='contained' sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE, width: "100px" }}>
+                            <Button
+                                type='submit'
+                                onClick={() => formik.handleSubmit()}
+                                variant='contained'
+                                sx={{
+                                    backgroundColor: theme.COLORS.PURPLE3,
+                                    color: theme.COLORS.WHITE,
+                                    width: "100px",
+                                    textTransform: "none"
+                                }}>
                                 Salvar
                             </Button>
                         </Box>
