@@ -113,7 +113,7 @@ const Home = () => {
             let totalExpenses = 0;
             let totalIncomes = 0;
             transactions
-              .filter((transaction) => transaction.status === 'COMPLETE')
+              .filter((transaction) => transaction.status === 'COMPLETE' && !transaction.isGoalContribution)
               .forEach((transaction) => {
                 if (transaction.isExpense) {
                   totalExpenses += transaction.value;

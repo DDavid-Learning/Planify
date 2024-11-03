@@ -31,6 +31,7 @@ export interface ITransaction {
     category: string;
     date: string;
     status: string;
+    isGoalContribution: boolean;
 }
 
 const options = [
@@ -51,6 +52,7 @@ const Transaction = () => {
         category: '',
         date: '',
         status: 'COMPLETE',
+        isGoalContribution: false,
     };
 
     const formik = useFormik({
@@ -132,7 +134,8 @@ const Transaction = () => {
             user: userID!,
             category: transaction.category.id,
             date: formatDateBr(transaction.date),
-            status: transaction.status
+            status: transaction.status,
+            isGoalContribution: false
         });
         setOpenEditTransaction(true);
     };
@@ -235,7 +238,15 @@ const Transaction = () => {
                                             <TableCell sx={cellStyle}>{formatDateBr(transaction.date) || 'Sem data'}</TableCell>
                                             <TableCell sx={cellStyle}>{formatCurrencyBR(transaction.value)}</TableCell>
                                             <TableCell sx={cellStyle}>
-                                                <StyledStatus status={transaction.isExpense ? 'Despesa' : 'Receita'} />
+                                                <StyledStatus status={(() => {
+                                                    if (transaction.isGoalContribution) {
+                                                        return "Contribuição"
+                                                    } else if (transaction.isExpense) {
+                                                        return "Despesa";
+                                                    } else {
+                                                        return "Receita";
+                                                    }
+                                                })()} />
                                             </TableCell>
                                             <TableCell sx={cellStyle}>{transaction.category.name}</TableCell>
                                             <TableCell sx={cellStyle}>

@@ -14,7 +14,7 @@ const StyledStatus = (props: IStyledStatus) => {
         switch (status) {
             case "Receita":
                 return "green";
-            case "CADASTRADO":
+            case "Contribuição":
                 return "yellow";
             case "Despesa":
                 return "red";
