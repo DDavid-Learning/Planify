@@ -43,10 +43,6 @@ function Navbar() {
   const [confirmation, setConfirmation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  function togglePassword() {
-    setShowPassword(!showPassword);
-  }
-
   const handleClickPages = (page: string) => {
     switch (page) {
       case "Dashboard":
@@ -102,7 +98,7 @@ function Navbar() {
   useEffect(() => {
     const fetchUserDetails = async () => {
       setIsLoading(true);
-      if (openProfileModal && userId) {
+      if (userId && formik.values.username === "") {
         try {
           const user = await userService.detailsUser(userId);
           setUser(user);
@@ -196,7 +192,10 @@ function Navbar() {
             })}
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
+          <Box sx={{ flexGrow: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 3 }}>
+            <Typography color='#fff'>
+              Olá, {formik.values.username}
+            </Typography>
             <Tooltip title="Abrir configurações">
               <IconButton
                 onClick={handleOpenUserMenu}
@@ -250,22 +249,51 @@ function Navbar() {
         onClose={handleCloseProfileModal}
         onOpen={handleOpenProfileModal}
       >
-        <Box sx={{ padding: "1rem", }}>
+        <Box sx={{ padding: 2, }}>
           {isLoading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "45svw", height: "30svh" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "30svh"
+              }}
+            >
               <CircularProgress />
             </Box>) : (
             <>
-              <Box sx={{ display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-between" }}>
-                <Box sx={{ backgroundColor: theme.COLORS.PURPLE3, borderRadius: "7px 20px 0 0", width: "max-content", padding: "0.3rem" }}>
-                  <Typography sx={{ color: theme.COLORS.WHITE, fontWeight: "bold" }}>Informações do Usuário</Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Box
+                  sx={{
+                    backgroundColor: theme.COLORS.PURPLE3,
+                    borderRadius: "7px 20px 0 0",
+                    width: "max-content",
+                    padding: "0.3rem"
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: theme.COLORS.WHITE,
+                      fontWeight: "bold"
+                    }}
+                  >Informações do Usuário
+                  </Typography>
                 </Box>
-
               </Box>
-
               <Box sx={{
-                display: "flex", flexDirection: "column", gap: "1rem", width: "100%", padding: "1rem",
-                borderRadius: "0 10px 10px 10px", border: "3px  solid", borderColor: theme.COLORS.PURPLE3
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+                padding: 2,
+                borderRadius: "0 10px 10px 10px",
+                border: "3px  solid",
+                borderColor: theme.COLORS.PURPLE3
               }}>
                 <GenericTextField<string>
                   label="Usuário"
@@ -303,62 +331,48 @@ function Navbar() {
                     },
                   }}
                 />
-                <Box sx={{ display: "flex", flexDirection: "row", gap: "5px", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
-                  <GenericTextField<string>
-                    label="Senha"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    value={formik.values.password}
-                    onChange={formik.handleChange}
-                    error={!!formik.errors.password}
-                    helperText={formik.errors.password}
-                    props={{
-                      fullWidth: true,
-                      InputProps: {
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton onClick={togglePassword}>
-                              {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      },
-                    }}
-                  />
-
-                  <GenericTextField<string>
-                    label="Confirmar Senha"
-                    name="confirmPassword"
-                    type={showPassword ? "text" : "password"}
-                    value={formik.values.confirmPassword}
-                    onChange={formik.handleChange}
-                    error={!!formik.errors.confirmPassword}
-                    helperText={formik.errors.confirmPassword}
-                    props={{
-                      fullWidth: true,
-                      InputProps: {
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton onClick={togglePassword} >
-                              {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      },
-                    }}
-                  />
-
-                </Box>
               </Box>
-              <Box sx={{ display: "flex", flexDirection: "row", gap: "1rem", width: "100%", justifyContent: "center", alignItems: "center", paddingTop: "1rem" }}>
-
-                <Button variant='contained' sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE, width: "100px" }} onClick={() => setOpenProfileModal(false)}>
-                  CANCELAR
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "1rem",
+                  width: "100%",
+                  justifyContent: "center",
+                  alignItems: "center", paddingTop: "1rem",
+                }}
+              >
+                <Button
+                  variant='contained'
+                  sx={{
+                    backgroundColor: theme.COLORS.PURPLE3,
+                    color: theme.COLORS.WHITE, width: "100px",
+                    textTransform: "none",
+                  }}
+                  onClick={() => setOpenProfileModal(false)}>
+                  Cancelar
                 </Button>
-                <Button type='submit' onClick={() => formik.handleSubmit()} variant='contained' sx={{ backgroundColor: theme.COLORS.PURPLE3, color: theme.COLORS.WHITE, width: "100px" }}>
+                <Button
+                  type="submit"
+                  onClick={() => formik.handleSubmit()}
+                  variant="contained"
+                  sx={{
+                    backgroundColor: theme.COLORS.PURPLE3,
+                    color: theme.COLORS.WHITE, width: "100px",
+                    textTransform: "none",
+                  }}
+                >
                   Salvar
                 </Button>
-                <Button onClick={() => setConfirmation(true)} variant='contained' sx={{ backgroundColor: theme.COLORS.RED, color: theme.COLORS.WHITE }}>
+
+                <Button
+                  onClick={() => setConfirmation(true)}
+                  variant='contained'
+                  sx={{
+                    backgroundColor: theme.COLORS.RED,
+                    color: theme.COLORS.WHITE,
+                    textTransform: "none",
+                  }}>
                   Deletar Conta
                 </Button>
               </Box>
