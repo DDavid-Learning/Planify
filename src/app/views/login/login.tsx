@@ -35,6 +35,7 @@ const Login = () => {
 
   async function handleLoginSubmit(values: any) {
     setIsLoading(true);
+    localStorage.removeItem('user');
     try {
       const resp = await auth.authenticate(values.email, values.password);
       setIsLoading(false);
@@ -57,7 +58,6 @@ const Login = () => {
   const handleLogin = useCallback(
     (values: any) => {
       handleLoginSubmit(values)
-
     },
     []
   );
@@ -68,7 +68,7 @@ const Login = () => {
       password: "",
     },
     validationSchema,
-    validateOnChange: false, // Validação será feita apenas no submit
+    validateOnChange: false,
     onSubmit: (values) => {
       handleLogin(values)
     },
