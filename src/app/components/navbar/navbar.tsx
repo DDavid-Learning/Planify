@@ -98,9 +98,9 @@ function Navbar() {
   useEffect(() => {
     const fetchUserDetails = async () => {
       setIsLoading(true);
-      if (userId && formik.values.username === "") {
+      if (userId && token) {
         try {
-          const user = await userService.detailsUser(userId);
+          const user = await userService.detailsUser(userId!);
           setUser(user);
           formik.setFieldValue("username", user.username);
           formik.setFieldValue("email", user.email);
@@ -165,7 +165,19 @@ function Navbar() {
     <Box sx={{ display: 'flex', width: '100%' }}>
       <AppBar position="static" sx={{ backgroundColor: theme.COLORS.PURPLE4 }}>
         <Toolbar sx={{ gap: 2 }}>
-          <Box sx={{ borderRadius: "50%", backgroundColor: theme.COLORS.GRAY6, width: "50px", height: "50px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Box
+            onClick={() => navigate("/home")}
+            sx={{
+              borderRadius: "50%",
+              backgroundColor: theme.COLORS.GRAY6,
+              width: "50px",
+              height: "50px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
             <LoginLogo />
           </Box>
 

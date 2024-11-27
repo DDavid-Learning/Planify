@@ -180,7 +180,8 @@ const Transaction = () => {
     };
 
     const rowStyle = (status: string) => ({
-        opacity: status === "PENDING" ? 0.8 : 1, // Grey out pending transactions
+        opacity: status === "PENDING" ? 0.8 : 1,
+        backgroundColor: status === "PENDING" && theme.COLORS.YELLOW,
     });
 
     const cellStyle = { fontSize: '1.0rem' };
@@ -238,7 +239,13 @@ const Transaction = () => {
                                         showPendingTransactions || transaction.status === 'COMPLETE'
                                     )
                                     .map((transaction: any) => (
-                                        <TableRow key={transaction.transactionId} style={{ ...rowStyle(transaction.status) }}>
+                                        <TableRow
+                                            key={transaction.transactionId}
+                                            style={{
+                                                ...rowStyle(transaction.status),
+                                                backgroundColor: transaction.status === "PENDING" ? theme.COLORS.GRAY5 : undefined,
+                                            }}
+                                        >
                                             <TableCell sx={cellStyle}>{transaction.sender}</TableCell>
                                             <TableCell sx={cellStyle}>{transaction.recipient}</TableCell>
                                             <TableCell sx={cellStyle}>{formatDateBr(transaction.date) || 'Sem data'}</TableCell>
@@ -289,7 +296,7 @@ const Transaction = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
-            </Box>
+            </Box >
 
             <DefaultModal
                 title='Adicionar Transação'
